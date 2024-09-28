@@ -1,9 +1,9 @@
 import React from "react";
-import { View, Text, ScrollView, Image, TouchableOpacity, ImageBackground, Button } from "react-native";
-import ProtectedRoute from "../components/ProtectedRoute";
-import Background from "@/components/Background";
+import { View, Button, StyleSheet } from "react-native";
+import ProtectedRoute from "../components/ProtectedRoute"; // Assuming you want to protect this route
+import Background from "@/components/Background"; // Adjust the path accordingly
 import { useRouter } from "expo-router";
-import { GlobalStyles } from "@/constants/GlobalStyles";
+import WeatherForecast from "../components/WeatherForecast"; // Import WeatherForecast component
 
 const HomeScreen: React.FC = () => 
 {
@@ -12,6 +12,8 @@ const HomeScreen: React.FC = () =>
     return (
         <ProtectedRoute>
             <Background>
+                <WeatherForecast />
+
                 <Button 
                     title="Overzicht" 
                     color="rgba(75, 0, 130, 1)" 
