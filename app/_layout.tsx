@@ -1,37 +1,78 @@
-import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
-import { useFonts } from 'expo-font';
-import { Stack } from 'expo-router';
-import * as SplashScreen from 'expo-splash-screen';
-import { useEffect } from 'react';
-import 'react-native-reanimated';
+import React from "react";
+import { View, TouchableOpacity, Text, Image } from "react-native";
+import { Stack, useRouter } from "expo-router";
+import { AuthProvider, useAuth } from "../components/AuthContext";
+import { GlobalStyles } from "@/constants/GlobalStyles";
+import { HeaderStyles } from "@/constants/GlobalStyles";
 
-import { useColorScheme } from '@/hooks/useColorScheme';
+export default function Layout() 
+{
+    const router = useRouter();
 
-// Prevent the splash screen from auto-hiding before asset loading is complete.
-SplashScreen.preventAutoHideAsync();
-
-export default function RootLayout() {
-  const colorScheme = useColorScheme();
-  const [loaded] = useFonts({
-    SpaceMono: require('../assets/fonts/SpaceMono-Regular.ttf'),
-  });
-
-  useEffect(() => {
-    if (loaded) {
-      SplashScreen.hideAsync();
-    }
-  }, [loaded]);
-
-  if (!loaded) {
-    return null;
-  }
-
-  return (
-    <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-      <Stack>
-        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-        <Stack.Screen name="+not-found" />
-      </Stack>
-    </ThemeProvider>
-  );
+    return (
+        <AuthProvider>
+            <View style={GlobalStyles.container}>
+                <Stack
+                    screenOptions={{
+                        // headerTransparent: true,
+                        headerStyle:
+                        {
+                            backgroundColor: "white",
+                        },
+                        headerLeft: () => <HomeButton onPress={() => router.push("/home")} />, 
+                        headerRight: () => <LogoutButton />, 
+                        headerTitle: () => <Logo />,
+                        headerTitleAlign: 'center',
+                    }}
+                >
+                    <Stack.Screen
+                        name="index"
+                        options={{
+                            headerShown: false,
+                        }}
+                    />
+                    <Stack.Screen
+                        name="home"
+                        options={{
+                            headerShown: true,
+                        }}
+                    />
+                </Stack>
+            </View>
+        </AuthProvider>
+    );
 }
+
+type HomeButtonProps = {
+    onPress: () => void;
+};
+
+const HomeButton: React.FC<HomeButtonProps> = ({ onPress }) => 
+{
+    return (
+        <TouchableOpacity style={HeaderStyles.logoutButton} onPress={onPress}>
+            <Text style={HeaderStyles.logoutButtonText}>Home</Text>
+        </TouchableOpacity>
+    );
+};
+
+const LogoutButton = () => 
+{
+    const { logout } = useAuth();
+
+    return (
+        <TouchableOpacity style={HeaderStyles.logoutButton} onPress={logout}>
+            <Text style={HeaderStyles.logoutButtonText}>Loguit</Text>
+        </TouchableOpacity>
+    );
+};
+
+const Logo = () => 
+{
+    return (
+        <Image
+            source={require('../assets/images/logo.png')}
+            style={{ width: 200, height: 70, resizeMode: "contain" }} 
+        />
+    );
+};

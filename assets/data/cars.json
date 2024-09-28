@@ -1,0 +1,203 @@
+[
+    {
+      "id": 1,
+      "merk": "Tesla",
+      "model": "Model S",
+      "bouwjaar": 2020,
+      "image": "../../assets/images/car_1.jpg",
+      "beschrijving": "Een elektrische auto met uitstekende prestaties en een stijlvol design."
+    },
+    {
+      "id": 2,
+      "merk": "BMW",
+      "model": "3 Series",
+      "bouwjaar": 2019,
+      "image": "../../assets/images/car_2.jpg",
+      "beschrijving": "Een luxe sportwagen met geavanceerde technologieën en een comfortabel interieur."
+    },
+    {
+      "id": 3,
+      "merk": "Audi",
+      "model": "A4",
+      "bouwjaar": 2018,
+      "image": "../../assets/images/car_3.jpg",
+      "beschrijving": "Een premium sedan met een krachtige motor en een modern ontwerp."
+    },
+    {
+      "id": 4,
+      "merk": "Mercedes-Benz",
+      "model": "C-Class",
+      "bouwjaar": 2017,
+      "image": "../../assets/images/car_4.jpg",
+      "beschrijving": "Een elegante auto met hoogwaardige afwerking en geavanceerde veiligheidsfuncties."
+    },
+    {
+      "id": 5,
+      "merk": "Ford",
+      "model": "Mustang",
+      "bouwjaar": 2016,
+      "image": "../../assets/images/car_4.jpg",
+      "beschrijving": "Een iconische sportwagen met een krachtige V8-motor en een opvallend ontwerp."
+    },
+    {
+      "id": 6,
+      "merk": "Chevrolet",
+      "model": "Camaro",
+      "bouwjaar": 2015,
+      "image": "../../assets/images/car_4.jpg",
+      "beschrijving": "Een Amerikaanse muscle car met een robuuste uitstraling en indrukwekkende prestaties."
+    },
+    {
+      "id": 7,
+      "merk": "Honda",
+      "model": "Civic",
+      "bouwjaar": 2014,
+      "image": "../../assets/images/car_4.jpg",
+      "beschrijving": "Een betrouwbare compacte auto met uitstekende brandstofefficiëntie en een sportief ontwerp."
+    },
+    {
+      "id": 8,
+      "merk": "Toyota",
+      "model": "Corolla",
+      "bouwjaar": 2013,
+      "image": "../../assets/images/car_4.jpg",
+      "beschrijving": "Een populaire sedan bekend om zijn duurzaamheid en lage onderhoudskosten."
+    },
+    {
+      "id": 9,
+      "merk": "Nissan",
+      "model": "Altima",
+      "bouwjaar": 2012,
+      "image": "../../assets/images/car_4.jpg",
+      "beschrijving": "Een middenklasse sedan met een comfortabele rit en een stijlvol uiterlijk."
+    },
+    {
+      "id": 10,
+      "merk": "Hyundai",
+      "model": "Elantra",
+      "bouwjaar": 2011,
+      "image": "../../assets/images/car_4.jpg",
+      "beschrijving": "Een betaalbare en betrouwbare compacte auto met een modern ontwerp."
+    },
+    {
+      "id": 11,
+      "merk": "Volkswagen",
+      "model": "Golf",
+      "bouwjaar": 2010,
+      "image": "../../assets/images/car_4.jpg",
+      "beschrijving": "Een veelzijdige hatchback met een verfijnd interieur en geavanceerde technologie."
+    },
+    {
+      "id": 12,
+      "merk": "Kia",
+      "model": "Optima",
+      "bouwjaar": 2009,
+      "image": "../../assets/images/car_4.jpg",
+      "beschrijving": "Een stijlvolle en ruime sedan met een uitstekende prijs-kwaliteitverhouding."
+    },
+    {
+      "id": 13,
+      "merk": "Subaru",
+      "model": "Impreza",
+      "bouwjaar": 2008,
+      "image": "../../assets/images/car_4.jpg",
+      "beschrijving": "Een compacte auto met vierwielaandrijving en een sportieve rijervaring."
+    },
+    {
+      "id": 14,
+      "merk": "Mazda",
+      "model": "3",
+      "bouwjaar": 2007,
+      "image": "../../assets/images/car_4.jpg",
+      "beschrijving": "Een compacte auto met een sportief ontwerp en uitstekende rijeigenschappen."
+    },
+    {
+      "id": 15,
+      "merk": "Dodge",
+      "model": "Charger",
+      "bouwjaar": 2006,
+      "image": "../../assets/images/car_4.jpg",
+      "beschrijving": "Een krachtige sedan met een opvallend ontwerp en een sterke motor."
+    },
+    {
+      "id": 16,
+      "merk": "Chrysler",
+      "model": "300",
+      "bouwjaar": 2005,
+      "image": "../../assets/images/car_4.jpg",
+      "beschrijving": "Een luxe sedan met een robuust ontwerp en een comfortabele rit."
+    },
+    {
+      "id": 17,
+      "merk": "Lexus",
+      "model": "IS",
+      "bouwjaar": 2004,
+      "image": "../../assets/images/car_4.jpg",
+      "beschrijving": "Een premium compacte sedan met een verfijnd interieur en geavanceerde technologie."
+    },
+    {
+      "id": 18,
+      "merk": "Acura",
+      "model": "TL",
+      "bouwjaar": 2003,
+      "image": "../../assets/images/car_4.jpg",
+      "beschrijving": "Een luxe middenklasse sedan met een sportieve rijervaring en geavanceerde functies."
+    },
+    {
+      "id": 19,
+      "merk": "Infiniti",
+      "model": "G35",
+      "bouwjaar": 2002,
+      "image": "../../assets/images/car_4.jpg",
+      "beschrijving": "Een sportieve en luxe sedan met een krachtige motor en een verfijnd interieur."
+    },
+    {
+      "id": 20,
+      "merk": "Volvo",
+      "model": "S60",
+      "bouwjaar": 2001,
+      "image": "../../assets/images/car_4.jpg",
+      "beschrijving": "Een veilige en betrouwbare sedan met een comfortabel interieur en een stijlvol ontwerp."
+    },
+    {
+      "id": 21,
+      "merk": "Jaguar",
+      "model": "X-Type",
+      "bouwjaar": 2000,
+      "image": "../../assets/images/car_4.jpg",
+      "beschrijving": "Een luxe sedan met een klassiek ontwerp en geavanceerde technologieën."
+    },
+    {
+      "id": 22,
+      "merk": "Porsche",
+      "model": "911",
+      "bouwjaar": 1999,
+      "image": "../../assets/images/car_4.jpg",
+      "beschrijving": "Een iconische sportwagen met uitstekende prestaties en een tijdloos ontwerp."
+    },
+    {
+      "id": 23,
+      "merk": "Ferrari",
+      "model": "F355",
+      "bouwjaar": 1998,
+      "image": "../../assets/images/car_4.jpg",
+      "beschrijving": "Een exotische sportwagen met een krachtige motor en een prachtig ontwerp."
+    },
+    {
+      "id": 24,
+      "merk": "Lamborghini",
+      "model": "Diablo",
+      "bouwjaar": 1997,
+      "image": "../../assets/images/car_4.jpg",
+      "beschrijving": "Een legendarische supercar met een opvallend ontwerp en ongelooflijke prestaties."
+    },
+    {
+      "id": 25,
+      "merk": "Mitsubishi",
+      "model": "Lancer Evolution",
+      "bouwjaar": 1996,
+      "image": "../../assets/images/car_4.jpg",
+      "beschrijving": "Een rally-geïnspireerde sportwagen met een krachtige motor en geavanceerde vierwielaandrijving."
+    }
+  ]
+  
