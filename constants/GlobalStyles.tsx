@@ -1,7 +1,7 @@
 import { StyleSheet, Dimensions } from "react-native";
 import Colors from "./Colors";
 
-const { width } = Dimensions.get('window');
+const { width, height } = Dimensions.get('window');
 
 export const GlobalStyles = StyleSheet.create({
     container: {
@@ -10,7 +10,7 @@ export const GlobalStyles = StyleSheet.create({
     overlay: {
         flex: 1,
         justifyContent: "center",
-        backgroundColor: 'rgba(255, 255, 255, 0.25)',
+        backgroundColor: 'rgba(255, 255, 255, 0.5)',
     },
     contentContainer: {
         flexGrow: 1,
@@ -25,13 +25,12 @@ export const GlobalStyles = StyleSheet.create({
         flex: 1,
         justifyContent: "center",
         alignItems: "center",
-        // backgroundColor: "#000",
-        padding: 20,
+        padding: width * 0.05,
     },
     layoutMessage: {
-        fontSize: 18,
+        fontSize: width * 0.045,
         color: "white",
-        marginBottom: 20,
+        marginBottom: height * 0.02,
         textAlign: "center",
     },
 });
@@ -40,27 +39,23 @@ export const HeaderStyles = StyleSheet.create({
     header: {
         borderBottomWidth: 0,
         shadowColor: Colors.light.primary,
-        shadowOffset: { width: 0, height: 10 },
+        shadowOffset: { width: 0, height: height * 0.015 },
         shadowOpacity: 0.5,
-        shadowRadius: 20,
+        shadowRadius: width * 0.05,
         elevation: 20,
-        // marginVertical: 10,
-        // paddingLeft: 20,
     },
     logoutButton: {
-        marginRight: 10,
-        paddingVertical: 10,
-        paddingHorizontal: 15,
-        // backgroundColor: Colors.light.primary,
+        marginRight: width * 0.025,
+        paddingVertical: height * 0.015,
+        paddingHorizontal: width * 0.04,
         backgroundColor: "white",
         borderRadius: 5,
-        marginLeft: 10,
+        marginLeft: width * 0.025,
         borderColor: Colors.light.primary,
         borderWidth: 3,
     },
     logoutButtonText: {
-        // color: Colors.light.white,
         color: Colors.light.primary,
-        fontSize: 16,
+        fontSize: width * 0.04,
     },
 });

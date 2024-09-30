@@ -1,4 +1,4 @@
-import { WEER_API_KEY } from "@env";
+// import { WEER_API_KEY } from "@env";
 
 interface LiveWeather {
     plaats: string; // Location name
@@ -26,7 +26,7 @@ export const getWeatherData = async (): Promise<WeatherResponse | null> =>
     try 
     {
         const location = "Leiden";
-        const url = `https://weerlive.nl/api/weerlive_api_v2.php?key=${WEER_API_KEY}&locatie=${location}`;
+        const url = `https://weerlive.nl/api/weerlive_api_v2.php?key=05ddd06644&locatie=${location}`;
 
         console.log("Fetching weather data from URL:", url); // Log URL for debugging
 
