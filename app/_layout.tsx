@@ -14,15 +14,7 @@ export default function Layout()
             <View style={GlobalStyles.container}>
                 <Stack
                     screenOptions={{
-                        // headerTransparent: true,
-                        headerStyle:
-                        {
-                            backgroundColor: "white",
-                        },
-                        headerLeft: () => <HomeButton onPress={() => router.push("/home")} />, 
-                        headerRight: () => <LogoutButton />, 
-                        headerTitle: () => <Logo />,
-                        headerTitleAlign: 'center',
+                        headerShown: false,
                     }}
                 >
                     <Stack.Screen
@@ -34,7 +26,7 @@ export default function Layout()
                     <Stack.Screen
                         name="home"
                         options={{
-                            headerShown: true,
+                            headerShown: false,
                         }}
                     />
                 </Stack>
