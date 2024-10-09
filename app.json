@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "sensor",
-    "slug": "sensor",
+    "name": "GoodGarden",
+    "slug": "GoodGarden",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/logo.png",
@@ -17,10 +17,10 @@
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/images/logo.png",
+        "foregroundImage": "./assets/images/logo_android.png",
         "backgroundColor": "#ffffff"
       },
-      "package": "com.znooptokkie.sensor"
+      "package": "com.znooptokkie.goodgarden"
     },
     "web": {
       "bundler": "metro",
@@ -37,7 +37,7 @@
     },
     "extra": {
       "eas": {
-        "projectId": "d615dc22-dbe8-4646-9acd-093ccf255607"
+        "projectId": "711b72df-eba1-4d82-b54a-696b3c906661"
       }
     }
   }
