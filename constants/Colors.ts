@@ -10,6 +10,7 @@ const Colors = {
     white: '#fff',
     gray: '#ccc',
     text: 'rgb(46, 86, 81)',
+    secundair_button: "#BFE5C2",
   },
   dark: {
     background: 'rgba(10, 10, 10, 1)',
@@ -22,3 +23,15 @@ const Colors = {
 };
 
 export default Colors;
+
+// Lichtgroen
+// DDF5DE
+
+// Donkerlichtgroen
+// abd3ae
+
+//donkergroen
+// 2E5651
+
+// Andere groen
+// BFE5C2

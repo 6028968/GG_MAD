@@ -21,6 +21,15 @@ export const GlobalStyles = StyleSheet.create({
         height: '100%',
         position: "absolute",
     },
+    backgroundInloggen:
+    {
+        flex: 1,
+        width: '100%',
+        height: '100%',
+        position: "absolute",
+        justifyContent: "center",
+        backgroundColor: "#DDF5DE",
+    },
     layoutContainer: {
         flex: 1,
         justifyContent: "center",
