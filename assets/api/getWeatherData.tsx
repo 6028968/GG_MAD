@@ -28,7 +28,7 @@ export const getWeatherData = async (): Promise<WeatherResponse | null> =>
         const location = "Leiden";
         const url = `https://weerlive.nl/api/weerlive_api_v2.php?key=05ddd06644&locatie=${location}`;
 
-        console.log("Fetching weather data from URL:", url); // Log URL for debugging
+        // console.log("Fetching weather data from URL:", url);
 
         const response = await fetch(url);
         
@@ -38,7 +38,7 @@ export const getWeatherData = async (): Promise<WeatherResponse | null> =>
         }
 
         const data: WeatherResponse = await response.json();
-        console.log("Weather data fetched successfully:", data); // Log data for debugging
+        // console.log("Weather data fetched successfully:", data); 
 
         return data; // Return the fetched weather data
     } 

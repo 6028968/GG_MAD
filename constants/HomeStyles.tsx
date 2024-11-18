@@ -22,18 +22,17 @@ export const homeStyles = StyleSheet.create({
         flexDirection: "column",
         alignItems: "center",
         marginHorizontal: margin,
-        // backgroundColor: "rgba(255, 255, 255, 0.75)",
-        backgroundColor: "white",
+        backgroundColor: "rgba(255, 255, 255, 0.75)",
         paddingTop: 5,
-        borderRadius: 5,
+        borderRadius: 15,
         elevation: 2, 
         borderWidth: 3,
         borderColor: Colors.light.primary,
     },
     weatherIcon:
     {
-        width: 50,
-        height: 50,
+        width: 70,
+        height: 70,
         marginBottom: 5,
     },
     text: 
@@ -43,127 +42,223 @@ export const homeStyles = StyleSheet.create({
     },
     tempContainer:
     {
-        // backgroundColor: Colors.light.primary,
+        backgroundColor: "rgba(171, 211, 174, 0.9)",
         borderBottomRightRadius: 2,
         borderBottomLeftRadius: 2,
-        padding: 2,
+        padding: 5,
+        width: "100%",
+        alignItems: "center"
     },
     dagen:
     {
-        fontSize: 14,
-        fontWeight: "bold",
-        // color: "white",
-        color: Colors.light.secundairLight,
+        fontSize: 24,
+        color: "white",
     },
     dayText:
     {
-        fontSize: 18,
+        fontSize: 24,
         marginBottom: 0,
-        color: "grey",
+        color: Colors.light.text,
         fontWeight: "bold",
     },
-    // scrollViewContent: 
-    // {
-    //     flexGrow: 1,
-    //     paddingBottom: 40,
-    //     // backgroundColor: "white",
-    //     margin: 10,
-    // },
-    // infoSectionContainer: 
-    // {
-    //     padding: 20,
-    //     borderWidth: 3,
-    //     borderColor: Colors.light.primary,
-    //     borderRadius: 20,
-    // },
-    // plantenContainer:
-    // {
-    //     backgroundColor: "white",
-    //     // backgroundColor: "rgba(255, 255, 255, 0.75)",
-    //     marginBottom: 25,
-    //     borderRadius: 20,
-    // },
-    // toggleContainer: 
-    // {
-    //     flexDirection: "row",
-    //     justifyContent: "center",
-    //     marginBottom: 20,
-    // },
-    // toggleButton: 
-    // {
-    //     flex: 1,
-    //     paddingVertical: 15,
-    //     alignItems: "center",
-    //     borderWidth: 3,
-    //     borderColor: Colors.light.primary,
-    // },
-    // activeButton: 
-    // {
-    //     backgroundColor: Colors.light.primary,
-    // },
-    // toggleText: 
-    // {
-    //     color: Colors.light.primary,
-    //     fontWeight: "bold",
-    //     fontSize: 20,
-    // },
-    // activeText: 
-    // {
-    //     color: "white",
-    //     fontSize: 20,
-    // },
-    // itemContainer: 
-    // {
-    //     flexDirection: "row",
-    //     alignItems: "center",
-    //     marginBottom: 20,
-    // },
-    // iconContainer: 
-    // {
-    //     backgroundColor: "black",
-    //     // padding: 10,
-    //     height: 60,
-    //     width: 60,
-    //     borderTopLeftRadius: 10,
-    //     borderBottomLeftRadius: 10,
-    // },
-    // labelContainer: 
-    // {
-    //     flex: 1,
-    //     backgroundColor: "#e0e0e0",
-    //     // padding: 15,
-    //     height: 60,
-    //     borderTopRightRadius: 10,
-    //     borderBottomRightRadius: 10,
-    // },
-    // itemLabel: 
-    // {
-    //     fontWeight: "bold",
-    // },
-    // plusButton: 
-    // {
-    //     alignSelf: "center",
-    //     marginBottom: 20,
-    //     borderWidth: 1,
-    //     borderColor: "black",
-    //     borderRadius: 50,
-    //     width: 50,
-    //     height: 50,
-    //     alignItems: "center",
-    //     justifyContent: "center",
-    // },
-    // listContainer: 
-    // {
-    //     flex: 1,
-    // },
-    // dottedItem: 
-    // {
-    //     height: 60,
-    //     backgroundColor: "#e0e0e0",
-    //     borderRadius: 10,
-    //     borderWidth: 1,
-    //     borderStyle: "dashed",
-    //     borderColor: "#777",
-    //     // marginBottom: 10,
-    // },
+    scrollViewContent: 
+    {
+        flexGrow: 1,
+        paddingBottom: 65,
+        margin: 10,
+    },
+    infoSectionContainer: 
+    {
+        padding: 20,
+        borderWidth: 3,
+        borderColor: Colors.light.primary,
+        borderRadius: 20,
+        backgroundColor: "rgba(255, 255, 255, 0.8)",
+    },
+    toggleContainer: 
+    {
+        flexDirection: "row",
+        justifyContent: "center",
+        marginBottom: 12.5,
+    },
+    toggleButtonLeft:
+    {
+        flex: 1,
+        paddingVertical: 15,
+        alignItems: "center",
+        borderWidth: 3,
+        borderColor: Colors.light.primary,
+        borderTopLeftRadius: 30,
+        borderBottomLeftRadius: 30,
+        backgroundColor: "white",
+    },
+    toggleButtonRight:
+    {
+        flex: 1,
+        paddingVertical: 15,
+        alignItems: "center",
+        borderWidth: 3,
+        borderColor: Colors.light.primary,
+        borderTopRightRadius: 30,
+        borderBottomRightRadius: 30,
+        backgroundColor: "white",
+    },
+    activeButton: 
+    {
+        backgroundColor: Colors.light.primary,
+    },
+    toggleText: 
+    {
+        color: Colors.light.text,
+        fontWeight: "400",
+        fontSize: 28,
+    },
+    activeText: 
+    {
+        color: "white",
+        fontWeight: "400",
+        fontSize: 28,
+    },
+    itemContainer: 
+    {
+        flexDirection: "row",
+        alignItems: "center",
+        marginBottom: 1,
+    },
+    iconContainer: 
+    {
+        // backgroundColor: Colors.light.primary,
+        backgroundColor: "rgba(171, 211, 174, 0.9)",
+        height: 80,
+        width: 80,
+        borderTopLeftRadius: 20,
+        borderBottomLeftRadius: 20,
+        alignItems: "center",
+        justifyContent: "center",
+    },
+    labelContainer: 
+    {
+        flex: 1,
+        justifyContent: "center",
+        paddingLeft: 10,
+        backgroundColor: "white",
+        height: 80,
+        borderTopRightRadius: 20,
+        borderBottomRightRadius: 20,
+        borderWidth: 3,
+        borderColor: "rgba(171, 211, 174, 1)"
+    },
+    itemLabel: 
+    {
+        // fontWeight: "bold",
+        fontSize: 25,
+        color: Colors.light.text,
+    },
+    plusButton: 
+    {
+        alignSelf: "center",
+        alignItems: "center",
+        justifyContent: "center",
+    },
+    listContainer: 
+    {
+        flex: 1,
+    },
+    dottedItem: 
+    {
+        height: 80,
+        borderRadius: 20,
+        borderWidth: 3,
+        borderStyle: "dashed",
+        // borderColor: "rgba(171, 211, 174, 0.5)",
+        borderColor: "rgba(211, 211, 211, 0.5)",
+        marginBottom: 1,
+        alignItems: "center",
+        justifyContent: "center",
+    },
+    modalOverlay: 
+    {
+        flex: 1,
+        justifyContent: "center",
+        alignItems: "center",
+        // backgroundColor: "rgba(0, 0, 0, 0.5)",
+    },
+    outerModalContainer: 
+    {
+        padding: 5, 
+        backgroundColor: "white", 
+        borderRadius: 5, 
+        // Schaduw toevoegen
+        elevation: 10,
+        shadowColor: "#000",
+        shadowOffset: { width: 0, height: 5 }, 
+        shadowOpacity: 0.3,
+        shadowRadius: 10, 
+    },
+    
+    modalContainer: 
+    {
+        width: 300,
+        padding: 20,
+        backgroundColor: "white",
+        borderRadius: 10,
+        alignItems: "center",
+        borderWidth: 3,
+        borderColor: "rgba(171, 211, 174, 1)", // Border kleur
+    },
+    
+    modalTitle: 
+    {
+        fontSize: 22,
+        // fontWeight: "bold",
+        color: Colors.light.text,
+        marginBottom: 15,
+        fontFamily: "Akaya",
+    },
+    inputText:
+    {
+        color: "rgba(128, 128, 128, 0.75)",
+        fontWeight: "bold",
+    },
+    input: 
+    {
+        width: "100%",
+        height: 40,
+        borderColor: Colors.light.primary,
+        borderWidth: 2,
+        borderRadius: 25,
+        marginBottom: 15,
+        paddingHorizontal: 10,
+        textAlign: "center",
+        // color: "rgba(128, 128, 128, 0.5)",
+    },
+    buttonContainer: 
+    {
+        flexDirection: "row",
+        justifyContent: "space-between",
+        width: "100%",
+        marginTop: 10,
+    },
+    button: 
+    {
+        flex: 1,
+        paddingVertical: 10,
+        marginHorizontal: 5,
+        alignItems: "center",
+        borderRadius: 25,
+    },
+    addButton:
+    {
+        backgroundColor: Colors.light.text, 
+    },
+    cancelButton:
+    {
+        backgroundColor: Colors.light.primary,
+    },
+    buttonText: 
+    {
+        color: "white",
+        fontWeight: "bold",
+        fontSize: 16,
+    },
 });

@@ -3,6 +3,7 @@ import { View, Text, ActivityIndicator, StyleSheet, FlatList, Image } from "reac
 import { getProcessedWeatherData } from "../assets/api/getWeatherData"; // Adjust the path accordingly
 import Colors from "@/constants/Colors";
 import { homeStyles } from "@/constants/HomeStyles";
+import { useFonts } from "expo-font";
 
 interface LiveWeather {
     plaats: string;
@@ -60,6 +61,17 @@ const getImageSource = (condition: string) =>
 
 const WeatherForecast: React.FC = () => 
 {
+    const [fontsLoaded] = useFonts({
+        "Afacad": require("../assets/fonts/Afacad-Regular.ttf"),
+        "Akaya": require("../assets/fonts/AkayaKanadaka-Regular.ttf"),
+    });
+
+    if (!fontsLoaded) 
+    {
+        return <ActivityIndicator size="large" color="#0000ff" />;
+    }
+
+
     const [weatherData, setWeatherData] = useState<any | null>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
@@ -119,13 +131,13 @@ const WeatherForecast: React.FC = () =>
                         keyExtractor={(item, index) => index.toString()}
                         renderItem={({ item }) => (
                             <View style={homeStyles.item}>
-                                <Text style={homeStyles.dayText}>{getDayOfWeek(item.dag)}</Text>
+                                <Text style={[homeStyles.dayText, { fontFamily: "Akaya" }]}>{getDayOfWeek(item.dag)}</Text>
                                 <Image
                                     source={getImageSource(item.image)}
                                     style={homeStyles.weatherIcon}
                                 />
                                 <View style={homeStyles.tempContainer}>
-                                    <Text style={homeStyles.dagen}>
+                                    <Text style={[homeStyles.dagen, { fontFamily: "Akaya" }]}>
                                         {item.avg_temp ?? "N/A"}°C
                                     </Text>
                                 </View>
