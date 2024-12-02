@@ -25,15 +25,16 @@ export const homeStyles = StyleSheet.create({
         backgroundColor: "rgba(255, 255, 255, 0.75)",
         paddingTop: 5,
         borderRadius: 15,
-        elevation: 2, 
+        // elevation: 2, 
         borderWidth: 3,
         borderColor: Colors.light.primary,
     },
     weatherIcon:
     {
-        width: 70,
-        height: 70,
-        marginBottom: 5,
+        width: 50,
+        height: 50,
+        marginTop: -15,
+        // marginBottom: 5,
     },
     text: 
     {
@@ -43,15 +44,15 @@ export const homeStyles = StyleSheet.create({
     tempContainer:
     {
         backgroundColor: "rgba(171, 211, 174, 0.9)",
-        borderBottomRightRadius: 2,
-        borderBottomLeftRadius: 2,
+        borderBottomRightRadius: 7,
+        borderBottomLeftRadius: 7,
         padding: 5,
         width: "100%",
         alignItems: "center"
     },
     dagen:
     {
-        fontSize: 24,
+        fontSize: 16,
         color: "white",
     },
     dayText:
@@ -59,7 +60,7 @@ export const homeStyles = StyleSheet.create({
         fontSize: 24,
         marginBottom: 0,
         color: Colors.light.text,
-        fontWeight: "bold",
+        // fontWeight: "bold",
     },
     scrollViewContent: 
     {
@@ -84,7 +85,8 @@ export const homeStyles = StyleSheet.create({
     toggleButtonLeft:
     {
         flex: 1,
-        paddingVertical: 15,
+        paddingVertical: 5,
+        paddingTop: 10,
         alignItems: "center",
         borderWidth: 3,
         borderColor: Colors.light.primary,
@@ -95,7 +97,8 @@ export const homeStyles = StyleSheet.create({
     toggleButtonRight:
     {
         flex: 1,
-        paddingVertical: 15,
+        paddingVertical: 5,
+        paddingTop: 10,
         alignItems: "center",
         borderWidth: 3,
         borderColor: Colors.light.primary,
@@ -146,7 +149,7 @@ export const homeStyles = StyleSheet.create({
         borderTopRightRadius: 20,
         borderBottomRightRadius: 20,
         borderWidth: 3,
-        borderColor: "rgba(171, 211, 174, 1)"
+        borderColor: "rgba(171, 211, 174, 1)",
     },
     itemLabel: 
     {
@@ -187,8 +190,7 @@ export const homeStyles = StyleSheet.create({
     {
         padding: 5, 
         backgroundColor: "white", 
-        borderRadius: 5, 
-        // Schaduw toevoegen
+        borderRadius: 10, 
         elevation: 10,
         shadowColor: "#000",
         shadowOffset: { width: 0, height: 5 }, 
@@ -202,28 +204,32 @@ export const homeStyles = StyleSheet.create({
         padding: 20,
         backgroundColor: "white",
         borderRadius: 10,
-        alignItems: "center",
+        // alignItems: "center",
         borderWidth: 3,
-        borderColor: "rgba(171, 211, 174, 1)", // Border kleur
+        borderColor: "rgba(171, 211, 174, 1)",
     },
     
     modalTitle: 
     {
-        fontSize: 22,
+        fontSize: 28,
         // fontWeight: "bold",
         color: Colors.light.text,
         marginBottom: 15,
         fontFamily: "Akaya",
+        textAlign: "center",
     },
     inputText:
     {
         color: "rgba(128, 128, 128, 0.75)",
         fontWeight: "bold",
+        // textAlign: "left",
+        fontSize: 16,
     },
     input: 
     {
         width: "100%",
-        height: 40,
+        // justifyContent: "center",
+        height: 50,
         borderColor: Colors.light.primary,
         borderWidth: 2,
         borderRadius: 25,
@@ -231,6 +237,7 @@ export const homeStyles = StyleSheet.create({
         paddingHorizontal: 10,
         textAlign: "center",
         // color: "rgba(128, 128, 128, 0.5)",
+        fontSize: 16,
     },
     buttonContainer: 
     {

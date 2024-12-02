@@ -44,7 +44,7 @@ export default function LoginScreen()
                                 isUsernameFocused && LoginStyles.inputFocused,
                                 { fontFamily: 'Afacad' } 
                             ]}
-                            placeholder={isUsernameFocused ? "" : "Gebruikersnaam"}  // Placeholder dynamisch op focus
+                            placeholder={isUsernameFocused ? "" : "Gebruikersnaam"} 
                             placeholderTextColor="rgba(203, 203, 203, 0.5)"
                             value={username}
                             onChangeText={setUsername}
@@ -59,7 +59,7 @@ export default function LoginScreen()
                                 isPasswordFocused && LoginStyles.inputFocused,
                                 { fontFamily: 'Afacad' }
                             ]}
-                            placeholder={isPasswordFocused ? "" : "Wachtwoord"}  // Placeholder dynamisch op focus
+                            placeholder={isPasswordFocused ? "" : "Wachtwoord"}  
                             placeholderTextColor="rgba(203, 203, 203, 0.5)"
                             value={password}
                             onChangeText={setPassword}

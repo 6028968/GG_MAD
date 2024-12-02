@@ -1,63 +1,162 @@
-import React from "react";
-import {
-    FlatList,
-    Text,
-    View,
-    TouchableOpacity,
-    StyleSheet,
-} from "react-native";
+import React, { useEffect, useState } from "react";
+import { FlatList, Text, View, TouchableOpacity, StyleSheet, Image } from "react-native";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import ProtectedRoute from "../components/ProtectedRoute";
 import { useRouter } from "expo-router";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
-import plants from "@/assets/data/plants.json"; // JSON-data importeren
+import { PlantItem } from "@/assets/types/plantTypes"
+import { homeStyles } from "@/constants/HomeStyles"
+import Background from "@/components/Background"; 
+import ExpandableMenu from "../components/MenuDownUnder"; 
+import Colors from "@/constants/Colors";
+import { useFonts } from "expo-font";
+import { styles } from "@/constants/PlantenStyles"
 
-type PlantItem = {
-    id: number;
-    naam: string;
-    soort: string;
-    wetenschappelijkeNaam: string;
-    aanwezig: boolean;
+const iconMap: Record<string, Record<string, any>> = {
+    fruit: {
+        available: require("@/assets/images/icons/soort/strawberry.png"),
+        unavailable: require("@/assets/images/icons/soort/strawberry.png"),
+    },
+    groente: {
+        available: require("@/assets/images/icons/soort/carrot.png"),
+        unavailable: require("@/assets/images/icons/soort/carrot.png"),
+    },
+    overig: {
+        available: require("@/assets/images/icons/soort/leaf.png"),
+        unavailable: require("@/assets/images/icons/soort/leaf.png"),
+    },
+    schimmel: {
+        available: require("@/assets/images/icons/soort/mushroom.png"),
+        unavailable: require("@/assets/images/icons/soort/mushroom.png"),
+    },
+    kruiden: {
+        available: require("@/assets/images/icons/soort/salt.png"),
+        unavailable: require("@/assets/images/icons/soort/salt.png"),
+    },
 };
 
+const capitalizeFirstLetter = (string: string): string => {
+    return string.charAt(0).toUpperCase() + string.slice(1).toLowerCase();
+}
 
-const PlantItemComponent: React.FC<PlantItem> = ({ id, naam, soort, wetenschappelijkeNaam, aanwezig }) => {
+const getIcon = (soort: string, aanwezig: boolean): any => {
+    const lowerSoort = soort.toLowerCase();
+    const status = aanwezig ? "available" : "unavailable";
+
+    if (iconMap[lowerSoort]) {
+        return iconMap[lowerSoort][status];
+    }
+};
+
+const PlantItemComponent: React.FC<{ plant: PlantItem | null }> = ({ plant }) => {
     const router = useRouter();
+
+    if (!plant) {
+        return <View style={[styles.placeholderItem]} />;
+    }
+
+    const [fontsLoaded] = useFonts({
+        "Afacad": require("../assets/fonts/Afacad-Regular.ttf"),
+        "Akaya": require("../assets/fonts/AkayaKanadaka-Regular.ttf"),
+    });
+
+    const textColor = plant.aanwezig ? "rgb(46, 86, 81)" : "lightgray";
+    const borderColor = plant.aanwezig ? "rgba(171, 211, 174, 1)" : "lightgray";
+    const iconColorBox = plant.aanwezig ? "rgba(171, 211, 174, 1)" : "lightgray";
+
     return (
         <TouchableOpacity
-            style={[styles.plantItem, aanwezig ? styles.activeItem : styles.inactiveItem]} // Gebruik aanwezig om stijl aan te passen
-            onPress={() => router.push(`/plant/${id}`)}
+            style={[
+                homeStyles.itemContainer,
+                plant.aanwezig ? styles.activeItem : styles.inactiveItem,
+            ]}
+            onPress={() => router.push(`/plant/${plant.id}`)}
         >
-            <View style={styles.iconContainer}>
-                <MaterialCommunityIcons name="apple" size={24} color="#4C8C4A" />
+            <View
+                style={[
+                    [homeStyles.iconContainer, {backgroundColor: iconColorBox}]
+                ]}
+            >
+                <Image
+                    source={getIcon(plant.soort, plant.aanwezig)}
+                    style={{ width: 50, height: 50 }}
+                    resizeMode="contain"
+                />
             </View>
-            <View>
-                <Text style={styles.plantName}>{naam}</Text>
-                <Text style={styles.plantDetails}>{wetenschappelijkeNaam}</Text>
+            <View style={[homeStyles.labelContainer, { borderColor: borderColor }]}>
+                <Text
+                    style={[
+                        homeStyles.itemLabel,
+                        { fontFamily: "Akaya", color: textColor },
+                    ]}
+                >
+                    {capitalizeFirstLetter(plant.naam)}
+                </Text>
+                <Text
+                    style={[
+                        styles.plantDetails,
+                        { fontFamily: "Afacad", color: textColor },
+                    ]}
+                >
+                    {plant.soort}
+                </Text>
             </View>
         </TouchableOpacity>
     );
 };
 
-
 const PlantList: React.FC = () => {
+    const [plants, setPlants] = useState<(PlantItem | null)[]>([]);
+    const [scrollPosition, setScrollPosition] = useState(0);
+
+    useEffect(() => {
+        const loadPlants = async () => {
+            try {
+                const savedPlants = await AsyncStorage.getItem("plants");
+                const parsedPlants: PlantItem[] = savedPlants ? JSON.parse(savedPlants) : [];
+                const totalItems = 20;
+                const placeholders = Array(totalItems - parsedPlants.length).fill(null);
+                const updatedPlants = [...parsedPlants, ...placeholders]; 
+                setPlants(updatedPlants);
+            } catch (error) {
+                console.error("Fout bij het laden van planten:", error);
+            }
+        };
+
+        loadPlants();
+    }, []);
+
+    const handleScroll = (event: any) => {
+        const offsetY = event.nativeEvent.contentOffset.y;
+        const contentHeight = event.nativeEvent.contentSize.height;
+        const viewHeight = event.nativeEvent.layoutMeasurement.height;
+
+        const scrollHeight = contentHeight - viewHeight;
+        const position = (offsetY / scrollHeight) * (viewHeight - 50);
+        setScrollPosition(position);
+    };
+
     return (
         <ProtectedRoute>
-            <View style={styles.container}>
-                <Text style={styles.title}>Alle Planten</Text>
-                <FlatList
-    data={plants}
-    renderItem={({ item }) => (
-        <PlantItemComponent
-            id={item.id}
-            naam={item.naam}
-            soort={item.soort}
-            wetenschappelijkeNaam={item.wetenschappelijkeNaam}
-            aanwezig={item.aanwezig} // Voeg aanwezig toe
-        />
-    )}
-    keyExtractor={(item) => item.id.toString()}
-/>
-
+            <Background>
+                <View style={styles.container}>
+                    <Text style={styles.title}>Alle Planten</Text>
+                    <FlatList
+                        data={plants}
+                        renderItem={({ item }) => <PlantItemComponent plant={item} />}
+                        keyExtractor={(item, index) => (item ? item.id.toString() : `placeholder-${index}`)}
+                        contentContainerStyle={{
+                            paddingVertical: 10,
+                            paddingHorizontal: 5,
+                        }}
+                        showsVerticalScrollIndicator={false}
+                        onScroll={handleScroll} 
+                        scrollEventThrottle={16}
+                    />
+                    <View style={styles.scrollbarTrack}>
+                        <View style={[styles.scrollbarThumb, { top: scrollPosition }]} />
+                    </View>
+                </View>
                 <View style={styles.footer}>
                     <TouchableOpacity style={styles.footerButton}>
                         <Text style={styles.footerButtonText}>+</Text>
@@ -65,108 +164,22 @@ const PlantList: React.FC = () => {
                     <TouchableOpacity style={styles.footerButton}>
                         <MaterialCommunityIcons
                             name="cog"
-                            size={24}
-                            color="#4C8C4A"
+                            size={50}
+                            color={Colors.light.primary}
                         />
                     </TouchableOpacity>
                     <TouchableOpacity style={styles.footerButton}>
                         <MaterialCommunityIcons
                             name="magnify"
-                            size={24}
-                            color="#4C8C4A"
+                            size={50}
+                            color={Colors.light.primary}
                         />
                     </TouchableOpacity>
                 </View>
-            </View>
+                <ExpandableMenu />
+            </Background>
         </ProtectedRoute>
     );
 };
-
-const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        backgroundColor: "#F0F9EE",
-        padding: 16,
-    },
-    title: {
-        fontSize: 24,
-        fontWeight: "bold",
-        textAlign: "center",
-        marginBottom: 16,
-        fontFamily: "Akaya",
-        color: "#4C8C4A",
-    },
-    list: {
-        flex: 1,
-        backgroundColor: "rgba(255, 255, 255, 0.9)",
-        borderRadius: 12,
-        padding: 10,
-    },
-    plantItem: {
-        flexDirection: "row",
-        alignItems: "center",
-        marginBottom: 12,
-        padding: 12,
-        backgroundColor: "#FFFFFF",
-        borderRadius: 10,
-        borderWidth: 1,
-        borderColor: "#E0E0E0",
-        shadowColor: "#000",
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.1,
-        shadowRadius: 4,
-    },
-    iconContainer: {
-        width: 40,
-        height: 40,
-        backgroundColor: "#E7F5E9",
-        borderRadius: 20,
-        justifyContent: "center",
-        alignItems: "center",
-        marginRight: 16,
-    },
-    plantName: {
-        fontSize: 18,
-        fontWeight: "bold",
-        color: "#4C8C4A",
-    },
-    plantDetails: {
-        fontSize: 14,
-        color: "#7B7B7B",
-    },
-    footer: {
-        flexDirection: "row",
-        justifyContent: "space-around",
-        alignItems: "center",
-        paddingVertical: 16,
-        backgroundColor: "#FFFFFF",
-        borderRadius: 12,
-        marginTop: 16,
-        shadowColor: "#000",
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.1,
-        shadowRadius: 4,
-    },
-    footerButton: {
-        width: 50,
-        height: 50,
-        borderRadius: 25,
-        backgroundColor: "#E7F5E9",
-        justifyContent: "center",
-        alignItems: "center",
-    },
-    footerButtonText: {
-        fontSize: 24,
-        color: "#4C8C4A",
-        fontWeight: "bold",
-    },
-    activeItem: {
-        borderColor: "#4C8C4A",
-    },
-    inactiveItem: {
-        borderColor: "#FF6F61",
-        opacity: 0.6,
-    },
-});
 
 export default PlantList;

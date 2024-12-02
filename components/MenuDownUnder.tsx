@@ -3,6 +3,7 @@ import { View, TouchableOpacity, Animated, Dimensions, StyleSheet, Text } from "
 import Colors from "@/constants/Colors";
 import { useRouter, Href } from "expo-router";
 import { useFonts } from "expo-font";
+import ClearStorageButton from "@/components/CLEARCACHE"; // Moet weggehaald worden zodra in productie gaat!!!
 
 const { height } = Dimensions.get("window");
 
@@ -29,7 +30,7 @@ const ExpandableMenu: React.FC = () =>
 
     const menuHeight = animation.interpolate({
         inputRange: [0, 1],
-        outputRange: [40, height * 0.5], // Verhoogde hoogte om alle knoppen te kunnen weergeven
+        outputRange: [40, height * 0.6], // Verhoogde hoogte om alle knoppen te kunnen weergeven
     });
 
     const navigateToPage = (page: Href) => 
@@ -47,36 +48,31 @@ const ExpandableMenu: React.FC = () =>
                 <TouchableOpacity onPress={() => navigateToPage("/home")}>
                     <Text style={[styles.menuItemText, { fontFamily: "Akaya" }]}>Home</Text>
                 </TouchableOpacity>
-                <View style={styles.divider} />
             
                 <TouchableOpacity onPress={() => navigateToPage("/planten")}>
                     <Text style={[styles.menuItemText, { fontFamily: "Akaya" }]}>Planten</Text>
                 </TouchableOpacity>
-                <View style={styles.divider} />
             
                 <TouchableOpacity onPress={() => navigateToPage("/")}>
                     <Text style={[styles.menuItemText, { fontFamily: "Akaya" }]}>Instellingen</Text>
                 </TouchableOpacity>
-                <View style={styles.divider} />
             
                 <TouchableOpacity onPress={() => navigateToPage("/")}>
                     <Text style={[styles.menuItemText, { fontFamily: "Akaya" }]}>Sensoren</Text>
                 </TouchableOpacity>
-                <View style={styles.divider} />
             
                 <TouchableOpacity onPress={() => navigateToPage("/")}>
                     <Text style={[styles.menuItemText, { fontFamily: "Akaya" }]}>Pompen</Text>
                 </TouchableOpacity>
-                <View style={styles.divider} />
             
                 <TouchableOpacity onPress={() => navigateToPage("/")}>
                     <Text style={[styles.menuItemText, { fontFamily: "Akaya" }]}>Data</Text>
                 </TouchableOpacity>
-                <View style={styles.divider} />
             
                 <TouchableOpacity onPress={() => navigateToPage("/")}>
                     <Text style={[styles.menuItemText, { fontFamily: "Akaya" }]}>Uitloggen</Text>
                 </TouchableOpacity>
+                <ClearStorageButton />
             </View>
             
             )}
@@ -138,14 +134,7 @@ const styles = StyleSheet.create({
         fontSize: 32,
         // fontWeight: "bold",
         textAlign: "center",
-    },
-    divider: 
-    {
-        width: "80%",
-        height: 1,
-        backgroundColor: "white",
-        marginVertical: 5,
-        minHeight: 1,
+        justifyContent: "center",
     },
 });
 
