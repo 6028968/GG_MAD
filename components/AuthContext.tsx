@@ -1,7 +1,8 @@
 import React, { createContext, useContext, useEffect, useState, ReactNode } from "react";
-import * as SecureStore from "expo-secure-store";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useRouter } from "expo-router";
 import { Platform } from "react-native";
+import bcrypt from "bcryptjs";
 
 interface AuthContextProps {
     isAuthenticated: boolean;
@@ -11,49 +12,67 @@ interface AuthContextProps {
     clearError: () => void;
 }
 
+interface User {
+    username: string;
+    email: string;
+    password: string;
+    role: string;
+}
+
 const AuthContext = createContext<AuthContextProps | undefined>(undefined);
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
     const [isAuthenticated, setIsAuthenticated] = useState(false);
     const [errorMessage, setErrorMessage] = useState("");
     const router = useRouter();
+    const [currentUser, setCurrentUser] = useState<User | null>(null);
 
     useEffect(() => {
-        const checkAuth = async () => {
-            if (Platform.OS !== "web") {
-                const storedAuth = await SecureStore.getItemAsync("MySecureAuthStateKey");
-                if (storedAuth) {
-                    setIsAuthenticated(true);
-                    router.push("/home");
-                }
+        const initializeAdmin = async () => {
+            const adminData: User = {
+                username: "admin",
+                email: "admin@admin.nl",
+                password: bcrypt.hashSync("admin", 10), 
+                role: "admin", 
+            };
+    
+            const storedUsers = await AsyncStorage.getItem("users");
+            let users: User[] = storedUsers ? JSON.parse(storedUsers) : [];
+    
+            const adminExists = users.some((user) => user.username === "admin");
+            if (!adminExists) {
+                users.push(adminData);
+                await AsyncStorage.setItem("users", JSON.stringify(users));
             }
         };
-        checkAuth();
-    }, []);
+    
+        initializeAdmin();
+    }, []);    
 
-    const login = async (username: string, password: string) => {
-        const hardcodedUsername = "admin";
-        const hardcodedPassword = "admin";
-
-        if (username === hardcodedUsername && password === hardcodedPassword) {
-            const auth = { username, password };
-            const storageValue = JSON.stringify(auth);
-
-            if (Platform.OS !== "web") {
-                await SecureStore.setItemAsync("MySecureAuthStateKey", storageValue);
+    const login = async (username: string, password: string) => 
+    {
+        const storedUsers = await AsyncStorage.getItem("users");
+        if (storedUsers) 
+        {
+            const users: User[] = JSON.parse(storedUsers);
+            const user = users.find((u) => u.username === username);
+    
+            if (user && bcrypt.compareSync(password, user.password)) 
+            {
+                const auth = { user };
+                await AsyncStorage.setItem("MySecureAuthStateKey", JSON.stringify(auth));
+                setCurrentUser(user);
+                setIsAuthenticated(true);
+                setErrorMessage("");
+                router.push("/home");
+                return;
             }
-            setIsAuthenticated(true);
-            setErrorMessage("");
-            router.push("/home");
-        } else {
-            setErrorMessage("Ongeldige gebruikersnaam of wachtwoord.");
         }
-    };
+        setErrorMessage("Ongeldige gebruikersnaam of wachtwoord.");
+    };        
 
     const logout = async () => {
-        if (Platform.OS !== "web") {
-            await SecureStore.deleteItemAsync("MySecureAuthStateKey");
-        }
+        await AsyncStorage.removeItem("MySecureAuthStateKey");
         setIsAuthenticated(false);
         router.push("/");
     };
@@ -63,7 +82,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     };
 
     return (
-        <AuthContext.Provider value={{ isAuthenticated, login, logout, errorMessage, clearError }}>
+        <AuthContext.Provider
+            value={{ isAuthenticated, login, logout, errorMessage, clearError }}
+        >
             {children}
         </AuthContext.Provider>
     );
