@@ -26,7 +26,7 @@ const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) =
     if (!isReady) {
         return (
             <View style={GlobalStyles.layoutContainer}>
-                <Text style={GlobalStyles.layoutMessage}>Loading...</Text>
+                <Text style={GlobalStyles.layoutMessage}>Laden...</Text>
             </View>
         );
     }
@@ -35,7 +35,6 @@ const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) =
         return (
             <View style={GlobalStyles.layoutContainer}>
                 <Text style={GlobalStyles.layoutMessage}>Je moet ingelogd zijn om deze inhoud te bekijken.</Text>
-                {/* <Button title="Login" onPress={() => router.push("/login")} /> */}
             </View>
         );
     }

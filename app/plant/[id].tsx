@@ -9,6 +9,7 @@ import ExpandableMenu from "@/components/MenuDownUnder";
 import { useFonts } from "expo-font";
 import { Plant } from "@/assets/types/plantTypes"
 import { styles } from "@/constants/PlantStyles"
+import AdminOnly from "@/components/AdminOnly";
 
 type CustomSwitchProps = {
     value: boolean;
@@ -44,11 +45,30 @@ const PlantDetail: React.FC = () => {
     const [plant, setPlant] = useState<Plant | null>(null);
     const [loading, setLoading] = useState(true);
     const router = useRouter();
+    const [isAdmin, setIsAdmin] = useState(false);
 
     const [fontsLoaded] = useFonts({
         "Afacad": require("../../assets/fonts/Afacad-Regular.ttf"),
         "Akaya": require("../../assets/fonts/AkayaKanadaka-Regular.ttf"),
     });
+
+    useEffect(() => {
+        const fetchUserRole = async () => {
+            try {
+                const storedAuth = await AsyncStorage.getItem("MySecureAuthStateKey");
+                if (storedAuth) {
+                    const { user } = JSON.parse(storedAuth);
+                    if (user.role === "admin") {
+                        setIsAdmin(true);
+                    }
+                }
+            } catch (error) {
+                console.error("Fout bij het ophalen van de gebruikersrol:", error);
+            }
+        };
+
+        fetchUserRole();
+    }, []);
 
     useEffect(() => {
         const loadPlant = async () => {
@@ -110,13 +130,20 @@ const PlantDetail: React.FC = () => {
                         <Text style={[styles.subtitle, { fontFamily: "Afacad" }]}>| {plant.soort}</Text>
                     </View>
                     <View style={styles.borderContainer}>
-                        <View style={styles.articleItems}>
-                            <Text style={[styles.teksten, { fontFamily: "Afacad" }]}>Aanwezig:</Text>
+                    <View style={styles.articleItems}>
+                        <Text style={[styles.teksten, { fontFamily: "Afacad" }]}>Aanwezig:</Text>
+                        <AdminOnly>
                             <CustomSwitch
                                 value={plant.aanwezig}
                                 onValueChange={toggleAanwezig}
                             />
-                        </View>
+                        </AdminOnly>
+                        {!isAdmin && (
+                            <Text style={[styles.teksten, styles.tweedeItem, { fontFamily: "Afacad" }]}>
+                                {plant.aanwezig ? "Ja" : "Nee"}
+                            </Text>
+                        )}
+                    </View>
                         <View style={styles.articleItems}>
                             <Text style={[styles.teksten, { fontFamily: "Afacad" }]}>Dagen in Kas:</Text>
                             <Text style={[styles.teksten, styles.tweedeItem, { fontFamily: "Afacad" }]}>{plant.dagenInKas}</Text>

@@ -12,6 +12,7 @@ import { homeStyles } from "@/constants/HomeStyles"
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Plant } from "@/assets/types/plantTypes";
 import DropDownPicker from "react-native-dropdown-picker";
+import AdminOnly from "@/components/AdminOnly";
 
 const capitalizeFirstLetter = (string: string): string => {
     return string.charAt(0).toUpperCase() + string.slice(1).toLowerCase();
@@ -160,41 +161,44 @@ const InfoSection: React.FC<{ toggle: string }> = ({ toggle }) => {
     return (
         <View style={homeStyles.infoSectionContainer}>
             <View style={homeStyles.listContainer}>
-                {getCurrentItems().map((plant, index) =>
-                    plant === "add" ? (
-                        // "+"-knop
+            {getCurrentItems().map((plant, index) =>
+                plant === "add" ? (
+                    // "+"-knop
+                    <AdminOnly key={`add-button-${toggle}-${index}`}> {/* Unieke key hier */}
                         <TouchableOpacity
-                            key={`add-new-${toggle}`}
                             onPress={handleAddItem}
                             style={homeStyles.dottedItem}
                         >
                             <MaterialCommunityIcons name="plus" size={60} color="rgba(171, 211, 174, 1)" />
                         </TouchableOpacity>
-                    ) : plant ? (
-                        // Plant item
-                        <TouchableOpacity
-                            key={plant.id}
-                            onPress={() => router.push(`/plant/${plant.id}`)}
-                            style={homeStyles.itemContainer}
-                        >
-                            <View style={homeStyles.iconContainer}>
-                                <Image
-                                    source={getIcon(plant.soort, plant.aanwezig)}
-                                    style={{ width: 50, height: 50 }}
-                                    resizeMode="contain"
-                                />
-                            </View>
-                            <View style={homeStyles.labelContainer}>
-                                <Text style={[homeStyles.itemLabel, { fontFamily: "Akaya" }]}>{capitalizeFirstLetter(plant.naam)}</Text>
-                                <Text>{plant.soort}</Text>
-                            </View>
-                        </TouchableOpacity>
-                    ) : (
-                        // Placeholder
-                        <View key={`placeholder-${index}`} style={homeStyles.dottedItem} />
-                    )
-                )}
-            </View>
+                    </AdminOnly>
+                ) : plant ? (
+                    // Plant item
+                    <TouchableOpacity
+                        key={`plant-${plant.id}`} // Unieke key per plant
+                        onPress={() => router.push(`/plant/${plant.id}`)}
+                        style={homeStyles.itemContainer}
+                    >
+                        <View style={homeStyles.iconContainer}>
+                            <Image
+                                source={getIcon(plant.soort, plant.aanwezig)}
+                                style={{ width: 50, height: 50 }}
+                                resizeMode="contain"
+                            />
+                        </View>
+                        <View style={homeStyles.labelContainer}>
+                            <Text style={[homeStyles.itemLabel, { fontFamily: "Akaya" }]}>
+                                {capitalizeFirstLetter(plant.naam)}
+                            </Text>
+                            <Text>{plant.soort}</Text>
+                        </View>
+                    </TouchableOpacity>
+                ) : (
+                    // Placeholder
+            <View key={`placeholder-${index}`} style={homeStyles.dottedItem} />
+    )
+)}
+        </View>
 
             <Modal
     animationType="slide"

@@ -35,9 +35,11 @@ export const GlobalStyles = StyleSheet.create({
         justifyContent: "center",
         alignItems: "center",
         padding: width * 0.05,
+        backgroundColor: "#DDF5DE",
     },
     layoutMessage: {
-        fontSize: width * 0.045,
+        fontSize: width * 0.100,
+        // color: Colors.light.text,
         color: "white",
         marginBottom: height * 0.02,
         textAlign: "center",
