@@ -28,6 +28,13 @@ export const homeStyles = StyleSheet.create({
         // elevation: 2, 
         borderWidth: 3,
         borderColor: Colors.light.primary,
+        // Android
+        elevation: 5,
+        // iOS
+        shadowColor: "gray",
+        shadowOffset: { width: 0, height: 5 },
+        shadowOpacity: 0.4,
+        shadowRadius: 10,
     },
     weatherIcon:
     {
@@ -75,6 +82,13 @@ export const homeStyles = StyleSheet.create({
         borderColor: Colors.light.primary,
         borderRadius: 20,
         backgroundColor: "rgba(255, 255, 255, 0.8)",
+        // Android
+        elevation: 5,
+        // iOS
+        shadowColor: "gray",
+        shadowOffset: { width: 0, height: 5 },
+        shadowOpacity: 0.4,
+        shadowRadius: 10,
     },
     toggleContainer: 
     {
@@ -130,7 +144,6 @@ export const homeStyles = StyleSheet.create({
     },
     iconContainer: 
     {
-        // backgroundColor: Colors.light.primary,
         backgroundColor: "rgba(171, 211, 174, 0.9)",
         height: 80,
         width: 80,
@@ -153,7 +166,6 @@ export const homeStyles = StyleSheet.create({
     },
     itemLabel: 
     {
-        // fontWeight: "bold",
         fontSize: 25,
         color: Colors.light.text,
     },
@@ -267,5 +279,9 @@ export const homeStyles = StyleSheet.create({
         color: "white",
         fontWeight: "bold",
         fontSize: 16,
+    },
+    soort:
+    {
+        color: Colors.light.gray,
     },
 });

@@ -1,5 +1,6 @@
 import { StyleSheet, Dimensions } from "react-native";
 import Colors from "./Colors";
+import Instellingen from "@/app/instellingen";
 
 const { width, height } = Dimensions.get('window');
 
@@ -39,10 +40,52 @@ export const GlobalStyles = StyleSheet.create({
     },
     layoutMessage: {
         fontSize: width * 0.100,
-        // color: Colors.light.text,
         color: "white",
         marginBottom: height * 0.02,
         textAlign: "center",
+    },
+    subTitle:
+    {
+        fontSize: 25,
+        color: Colors.light.text,
+    },
+    instellingenInput:
+    {
+        paddingLeft: 20,  
+    },
+    gevaarTekst:
+    {
+        color: "red",
+        fontSize: 18,
+        fontWeight: "bold",
+    },
+    scrollViewContent: 
+    {
+        flexGrow: 1,
+        paddingBottom: 65,
+    },
+    button: 
+    {
+        height: 45,
+        borderRadius: 30,
+        justifyContent: "center",
+        alignItems: "center",
+        backgroundColor: Colors.light.text,
+        alignSelf: "flex-end", 
+        paddingHorizontal: 20,
+        marginTop: 10,
+        // Android
+        elevation: 5,
+        // iOS
+        shadowColor: "gray",
+        shadowOffset: { width: 0, height: 5 },
+        shadowOpacity: 0.4,
+        shadowRadius: 10,
+    },
+    buttonTekst:
+    {
+        color: "white",
+        fontSize: 20,
     },
 });
 

@@ -3,7 +3,6 @@ import { View, TouchableOpacity, Animated, Dimensions, StyleSheet, Text } from "
 import Colors from "@/constants/Colors";
 import { useRouter, Href } from "expo-router";
 import { useFonts } from "expo-font";
-import ClearStorageButton from "@/components/CLEARCACHE"; // Moet weggehaald worden zodra in productie gaat!!!
 
 const { height } = Dimensions.get("window");
 
@@ -30,7 +29,7 @@ const ExpandableMenu: React.FC = () =>
 
     const menuHeight = animation.interpolate({
         inputRange: [0, 1],
-        outputRange: [40, height * 0.6], // Verhoogde hoogte om alle knoppen te kunnen weergeven
+        outputRange: [40, height * 0.6],
     });
 
     const navigateToPage = (page: Href) => 
@@ -53,26 +52,25 @@ const ExpandableMenu: React.FC = () =>
                     <Text style={[styles.menuItemText, { fontFamily: "Akaya" }]}>Planten</Text>
                 </TouchableOpacity>
             
-                <TouchableOpacity onPress={() => navigateToPage("/")}>
+                <TouchableOpacity onPress={() => navigateToPage("/instellingen")}>
                     <Text style={[styles.menuItemText, { fontFamily: "Akaya" }]}>Instellingen</Text>
                 </TouchableOpacity>
             
-                <TouchableOpacity onPress={() => navigateToPage("/")}>
+                <TouchableOpacity onPress={() => navigateToPage("/sensoren")}>
                     <Text style={[styles.menuItemText, { fontFamily: "Akaya" }]}>Sensoren</Text>
                 </TouchableOpacity>
             
-                <TouchableOpacity onPress={() => navigateToPage("/")}>
+                <TouchableOpacity onPress={() => navigateToPage("/pompen")}>
                     <Text style={[styles.menuItemText, { fontFamily: "Akaya" }]}>Pompen</Text>
                 </TouchableOpacity>
             
-                <TouchableOpacity onPress={() => navigateToPage("/")}>
+                <TouchableOpacity onPress={() => navigateToPage("/data")}>
                     <Text style={[styles.menuItemText, { fontFamily: "Akaya" }]}>Data</Text>
                 </TouchableOpacity>
             
                 <TouchableOpacity onPress={() => navigateToPage("/")}>
                     <Text style={[styles.menuItemText, { fontFamily: "Akaya" }]}>Uitloggen</Text>
                 </TouchableOpacity>
-                <ClearStorageButton />
             </View>
             
             )}

@@ -164,7 +164,7 @@ const InfoSection: React.FC<{ toggle: string }> = ({ toggle }) => {
             {getCurrentItems().map((plant, index) =>
                 plant === "add" ? (
                     // "+"-knop
-                    <AdminOnly key={`add-button-${toggle}-${index}`}> {/* Unieke key hier */}
+                    <AdminOnly key={`add-button-${toggle}-${index}`}>
                         <TouchableOpacity
                             onPress={handleAddItem}
                             style={homeStyles.dottedItem}
@@ -175,7 +175,7 @@ const InfoSection: React.FC<{ toggle: string }> = ({ toggle }) => {
                 ) : plant ? (
                     // Plant item
                     <TouchableOpacity
-                        key={`plant-${plant.id}`} // Unieke key per plant
+                        key={`plant-${plant.id}`} 
                         onPress={() => router.push(`/plant/${plant.id}`)}
                         style={homeStyles.itemContainer}
                     >
@@ -190,7 +190,7 @@ const InfoSection: React.FC<{ toggle: string }> = ({ toggle }) => {
                             <Text style={[homeStyles.itemLabel, { fontFamily: "Akaya" }]}>
                                 {capitalizeFirstLetter(plant.naam)}
                             </Text>
-                            <Text>{plant.soort}</Text>
+                            <Text style={homeStyles.soort}>{plant.soort}</Text>
                         </View>
                     </TouchableOpacity>
                 ) : (

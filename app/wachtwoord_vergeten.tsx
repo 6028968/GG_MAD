@@ -11,7 +11,6 @@ export default function ForgotPasswordScreen()
     const [errorMessage, setErrorMessage] = useState("");  
     const [fontsLoaded, setFontsLoaded] = useState(false);
     
-    // Toevoeging voor focusstate van het emailveld
     const [isEmailFocused, setIsEmailFocused] = useState(false);
 
     const router = useRouter();  

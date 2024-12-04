@@ -3,7 +3,6 @@ import { View, Text, TouchableOpacity } from "react-native";
 import { useRouter } from "expo-router";
 import { GlobalStyles } from "@/constants/GlobalStyles";
 import { LoginStyles } from "@/constants/LoginStyles";
-import { useFonts } from 'expo-font';
 
 export default function PasswordResetConfirmationScreen() 
 {

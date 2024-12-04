@@ -6,20 +6,7 @@ import { useRouter } from "expo-router";
 import { useFonts } from "expo-font";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import bcrypt from "bcryptjs";
-
-interface ValidationErrors {
-    username?: string;
-    email?: string;
-    password?: string;
-    confirmPassword?: string;
-}
-
-interface User {
-    username: string;
-    email: string;
-    password: string;
-    role: string;
-}
+import { User, ValidationErrors } from "@/assets/interfaces/customInterfaces";
 
 export default function RegisterScreen() {
     const [username, setUsername] = useState("");
@@ -83,18 +70,30 @@ export default function RegisterScreen() {
         const salt = bcrypt.genSaltSync(10);
         const hashedPassword = bcrypt.hashSync(password, salt);
     
+        const formatDate = (date: Date): string => {
+            const day = String(date.getDate()).padStart(2, "0");
+            const month = String(date.getMonth() + 1).padStart(2, "0"); 
+            const year = date.getFullYear();
+            return `${day}-${month}-${year}`;
+        };
+        
         const newUser: User = {
             username,
             email,
             password: hashedPassword,
             role: "gebruiker",
+            aangemaakt: formatDate(new Date()), 
         };
+        
     
         users.push(newUser);
         await AsyncStorage.setItem("users", JSON.stringify(users));
     
-        router.push("/");
-    };    
+        Alert.alert("Succes", "Registratie voltooid. U kunt nu inloggen.", [
+            { text: "OK", onPress: () => router.push("/") },
+        ]);
+    };
+    
 
     if (!fontsLoaded) {
         return null;

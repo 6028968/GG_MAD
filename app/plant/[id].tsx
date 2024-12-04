@@ -9,12 +9,7 @@ import ExpandableMenu from "@/components/MenuDownUnder";
 import { useFonts } from "expo-font";
 import { Plant } from "@/assets/types/plantTypes"
 import { styles } from "@/constants/PlantStyles"
-import AdminOnly from "@/components/AdminOnly";
-
-type CustomSwitchProps = {
-    value: boolean;
-    onValueChange: (value: boolean) => void;
-};
+import { CustomSwitchProps } from "@/assets/types/customTypes";
 
 const capitalizeFirstLetter = (string: string): string => {
     return string.charAt(0).toUpperCase() + string.slice(1).toLowerCase();
@@ -55,7 +50,7 @@ const PlantDetail: React.FC = () => {
     useEffect(() => {
         const fetchUserRole = async () => {
             try {
-                const storedAuth = await AsyncStorage.getItem("MySecureAuthStateKey");
+                const storedAuth = await AsyncStorage.getItem("8JUhZ1hcFU1xFzYwf8CeWeNzYpf5ArUb");
                 if (storedAuth) {
                     const { user } = JSON.parse(storedAuth);
                     if (user.role === "admin") {
@@ -102,7 +97,6 @@ const PlantDetail: React.FC = () => {
             );
             await AsyncStorage.setItem("plants", JSON.stringify(updatedPlants));
 
-            // Navigeren naar de homepage
             router.push("/home");
         } catch (error) {
             console.error("Fout bij het updaten van de aanwezigheid:", error);
@@ -132,18 +126,14 @@ const PlantDetail: React.FC = () => {
                     <View style={styles.borderContainer}>
                     <View style={styles.articleItems}>
                         <Text style={[styles.teksten, { fontFamily: "Afacad" }]}>Aanwezig:</Text>
-                        <AdminOnly>
-                            <CustomSwitch
-                                value={plant.aanwezig}
-                                onValueChange={toggleAanwezig}
-                            />
-                        </AdminOnly>
-                        {!isAdmin && (
+                        {isAdmin ? (
+                            <CustomSwitch value={plant.aanwezig} onValueChange={toggleAanwezig} />
+                        ) : (
                             <Text style={[styles.teksten, styles.tweedeItem, { fontFamily: "Afacad" }]}>
                                 {plant.aanwezig ? "Ja" : "Nee"}
                             </Text>
                         )}
-                    </View>
+                        </View>
                         <View style={styles.articleItems}>
                             <Text style={[styles.teksten, { fontFamily: "Afacad" }]}>Dagen in Kas:</Text>
                             <Text style={[styles.teksten, styles.tweedeItem, { fontFamily: "Afacad" }]}>{plant.dagenInKas}</Text>

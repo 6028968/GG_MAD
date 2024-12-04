@@ -15,6 +15,13 @@ export const styles = StyleSheet.create({
         marginTop: 40,
         marginHorizontal: 10,
         flex: 1,
+        // Android
+        elevation: 5,
+        // iOS
+        shadowColor: "gray",
+        shadowOffset: { width: 0, height: 5 },
+        shadowOpacity: 0.4,
+        shadowRadius: 10,
     },
     title: {
         fontSize: 40,
@@ -60,6 +67,13 @@ export const styles = StyleSheet.create({
         alignItems: "center",
         borderWidth: 3,
         borderColor: Colors.light.primary,
+        // Android
+        elevation: 5,
+        // iOS
+        shadowColor: "gray",
+        shadowOffset: { width: 0, height: 5 },
+        shadowOpacity: 0.4,
+        shadowRadius: 10,
 
     },
     footerButtonText: {

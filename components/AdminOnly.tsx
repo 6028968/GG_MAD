@@ -1,10 +1,6 @@
 import React, { useEffect, useState } from "react";
-import { View } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-
-interface AdminOnlyProps {
-    children: React.ReactNode;
-}
+import { AdminOnlyProps } from "@/assets/interfaces/customInterfaces";
 
 const AdminOnly: React.FC<AdminOnlyProps> = ({ children }) => {
     const [isAdmin, setIsAdmin] = useState(false);
@@ -13,7 +9,7 @@ const AdminOnly: React.FC<AdminOnlyProps> = ({ children }) => {
     useEffect(() => {
         const fetchUserRole = async () => {
             try {
-                const storedAuth = await AsyncStorage.getItem("MySecureAuthStateKey");
+                const storedAuth = await AsyncStorage.getItem("8JUhZ1hcFU1xFzYwf8CeWeNzYpf5ArUb");
                 if (storedAuth) {
                     const { user } = JSON.parse(storedAuth);
                     if (user.role === "admin") {
