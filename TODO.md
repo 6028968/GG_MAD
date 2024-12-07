@@ -31,6 +31,8 @@
 
 ## --- Pompen ---
 
+- [ ] Optie toevoegen voor admin om pompen te beheren?
+
 ## --- Logboek ---
 
 ### Notes

@@ -36,8 +36,8 @@ export const sensorStyles = StyleSheet.create({
         marginBottom: 5,
     },
     sensorIcon: {
-        width: 50,
-        height: 50,
+        width: 40,
+        height: 40,
         marginHorizontal: 10,
     },
     sensorInfo: {

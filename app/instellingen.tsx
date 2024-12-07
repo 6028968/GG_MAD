@@ -53,19 +53,19 @@ const Instellingen: React.FC = () => {
     const [isEmailFocused, setIsEmailFocused] = useState(false);  
     const [isConfirmPasswordFocused, setIsConfirmPasswordFocused] = useState(false);
     
-    type CustomSwitchProps = {
-        value: boolean;
-        onValueChange: (value: boolean) => void;
-    };
+    // type CustomSwitchProps = {
+    //     value: boolean;
+    //     onValueChange: (value: boolean) => void;
+    // };
 
     const [fontsLoaded] = useFonts({
         "Afacad": require("../assets/fonts/Afacad-Regular.ttf"),
         "Akaya": require("../assets/fonts/AkayaKanadaka-Regular.ttf"),
     });
 
-    const toggleAanwezig = () => {
-        console.log("Switch toggled, huidige waarde:", switchValue);
-    };
+    // const toggleAanwezig = () => {
+    //     console.log("Switch toggled, huidige waarde:", switchValue);
+    // };
 
     useEffect(() => {
         const fetchUser = async () => {

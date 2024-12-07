@@ -130,7 +130,7 @@ const Sensoren: React.FC = () => {
                             <Image source={sensorIcon} style={sensorStyles.sensorIcon} />
                             <Text style={sensorStyles.title}>Sensor {item.sensorID}</Text>
                         </View>
-                        <View style={[plantStyles.articlesParent, { gap: 10, paddingHorizontal: 5 }]}>
+                        <View style={[plantStyles.articlesParent, { gap: 10, paddingHorizontal: 5, paddingTop: 5 }]}>
                             <View style={plantStyles.articleItems}>
                                 <Text style={[plantStyles.teksten, { fontFamily: "Afacad" }]}>Actief:</Text>
                                 <Text style={[plantStyles.teksten, plantStyles.tweedeItem, { fontFamily: "Afacad" }]}>
