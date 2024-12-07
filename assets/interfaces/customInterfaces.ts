@@ -74,10 +74,22 @@ export interface Foutmelding {
     apparaatID: number;
     tijdstip: string;
     foutcode: number;
+    foutmeldingID: number;
+}
+
+export interface Wijziging
+{
+    apparaat: string;
+    apparaatID: number;
+    apparaatsoort: string;
+    tijdstip: string;
+    wijziging: string;
+    wijzigingID: number;
 }
 
 export interface Logboek {
     foutmeldingen: Foutmelding[];
+    wijzigingen: Wijziging[];
 }
 
 export interface KasResponse {

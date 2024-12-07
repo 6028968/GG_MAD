@@ -1,43 +1,34 @@
 import React, { useEffect, useState } from "react";
-import { View, Text, ActivityIndicator, FlatList, Image, StyleSheet, TouchableOpacity } from "react-native";
+import { FlatList, Text, View, TouchableOpacity, StyleSheet, Image } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { homeStyles } from "@/constants/HomeStyles";
-import Background from "@/components/Background";
-import ExpandableMenu from "@/components/MenuDownUnder";
+import ProtectedRoute from "../components/ProtectedRoute";
+import { useRouter } from "expo-router";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
+import { PlantItem } from "@/assets/types/plantTypes"
+import { homeStyles } from "@/constants/HomeStyles"
+import Background from "@/components/Background"; 
+import ExpandableMenu from "../components/MenuDownUnder"; 
+import Colors from "@/constants/Colors";
 import { useFonts } from "expo-font";
+import { plantenStyles } from "@/constants/PlantenStyles"
+import { Foutmelding, Wijziging } from "@/assets/interfaces/customInterfaces";
 import { plantStyles } from "@/constants/PlantStyles";
-import { Pomp } from "@/assets/interfaces/customInterfaces";
 import { sensorStyles } from "@/constants/SensorStyles";
-import { CustomSwitchProps } from "@/assets/types/customTypes";
 
-const pompIcon = require("@/assets/images/icons/pump.png");
+const capitalizeFirstLetter = (string: string): string => {
+    return string.charAt(0).toUpperCase() + string.slice(1).toLowerCase();
+}
 
-const CustomSwitch: React.FC<CustomSwitchProps> = ({ value, onValueChange }) => {
-    return (
-        <TouchableOpacity
-            style={[
-                plantStyles.switchContainer,
-                value ? plantStyles.switchOn : plantStyles.switchOff,
-            ]}
-            onPress={() => onValueChange(!value)}
-            activeOpacity={0.8}
-        >
-            <View
-                style={[
-                    plantStyles.thumb,
-                    value ? plantStyles.thumbOn : plantStyles.thumbOff,
-                ]}
-            />
-        </TouchableOpacity>
-    );
-};
-
-const Pompen: React.FC = () => {
+const Data: React.FC = () => {
+    // const [plants, setPlants] = useState<(PlantItem | null)[]>([]);
+    // const [scrollPosition, setScrollPosition] = useState(0);
     const [loading, setLoading] = useState(true);
     const [isAdmin, setIsAdmin] = useState(false);
-    const [pompen, setPompen] = useState<Pomp[]>([]);
+    const [foutmeldingen, setFoutmelding] = useState<Foutmelding[]>([]);
+    const [wijzingen, setWijziging] = useState<Wijziging[]>([])
     const [error, setError] = useState<string | null>(null);
-    const [switchValues, setSwitchValues] = useState<{ [key: number]: boolean }>({});
+    const [isOpen, setIsOpen] = useState(false);
+    const [isWijzigingenOpen, setIsWijzigingenOpen] = useState(false);
 
     const [fontsLoaded] = useFonts({
         "Afacad": require("../assets/fonts/Afacad-Regular.ttf"),
@@ -59,153 +50,308 @@ const Pompen: React.FC = () => {
             }
         };
 
-        const fetchPompData = async () => 
+        const fetchFoutmeldingData = async () => 
             {
                 try 
                 {
                     const response = await fetch("http://localhost:3000/fetch-data");
                     if (!response.ok) 
                     {
-                        throw new Error(`Fout bij het ophalen van de pompgegevens: ${response.statusText}`);
+                        throw new Error(`Fout bij het ophalen van de foutmeldingen: ${response.statusText}`);
                     }
                     const data = await response.json();
-                    const pompen = Object.values(data.pompen) as Pomp[];
-                    setPompen(pompen);
-            
-                    const initialSwitchValues = pompen.reduce<Record<number, boolean>>((acc, pomp) => 
-                    {
-                        acc[pomp.pompID] = false; 
-                        return acc;
-                    }, {});
-                    setSwitchValues(initialSwitchValues);
+                    console.log("Ophalen JSON data:", data); 
+                    setFoutmelding(data.logboek.foutmeldingen); 
                 } 
                 catch (error) 
                 {
-                    console.error("Fout bij het ophalen van pompgegevens:", error);
-                    setError("Kan pompgegevens niet ophalen.");
+                    console.error("Fout bij het ophalen van foutmeldinggegevens:", error);
+                    setError("Kan foutmeldingen niet ophalen.");
                 } 
                 finally 
                 {
                     setLoading(false);
                 }
-            };
+            };         
+            
+            const fetchWijzingenData = async () => {
+                try {
+                    const response = await fetch("http://localhost:3000/fetch-data");
+                    if (!response.ok) {
+                        throw new Error(`Fout bij het ophalen van wijzigingen: ${response.statusText}`);
+                    }
+                    const data = await response.json();
+                    setWijziging(data.logboek.wijzigingen); // Correct gebruik van setWijziging
+                } 
+                catch (error) {
+                    console.error("Fout bij het ophalen van wijziginggegevens:", error);
+                    setError("Kan wijzigingen niet ophalen.");
+                } 
+                finally {
+                    setLoading(false);
+                }
+            };            
 
-        fetchUserRole();
-        fetchPompData();
+            fetchUserRole();
+            fetchFoutmeldingData();
+            fetchWijzingenData();
     }, []);
 
-    const handleSwitchChange = (pompID: number, newValue: boolean) => {
-        setSwitchValues((prevValues) => ({
-            ...prevValues,
-            [pompID]: newValue,
-        }));
-    };
-
-    if (!fontsLoaded || loading) {
-        return <ActivityIndicator size="large" />;
-    }
-
-    if (error) {
-        return (
-            <Background>
-                <View style={plantStyles.container}>
-                    <View style={[homeStyles.infoSectionContainer, plantStyles.articlesParent]}>
-                        <Text style={plantStyles.errorText}>{error}</Text>
-                    </View>
-                </View>
-            </Background>
-        );
-    }
+    const [scrollPosition, setScrollPosition] = useState(0);
+    const [scrollHeight, setScrollHeight] = useState(0);
+    
+    const handleScroll = (event: any) => {
+        const offsetY = event.nativeEvent.contentOffset.y;
+        const contentHeight = event.nativeEvent.contentSize.height;
+        const viewHeight = event.nativeEvent.layoutMeasurement.height;
+    
+        const totalScrollableHeight = contentHeight - viewHeight;
+        setScrollHeight(totalScrollableHeight);
+    
+        const position = (offsetY / totalScrollableHeight) * (viewHeight - 50);
+        setScrollPosition(Math.max(0, position));
+    };    
 
     return (
+        // <ProtectedRoute>
         <Background>
             <View style={sensorStyles.mainContainer}>
-                <FlatList
-                    data={pompen}
-                    style={sensorStyles.flatList}
-                    keyExtractor={(item) => item.pompID.toString()}
-                    renderItem={({ item, index }) => (
-                        <View
-                            style={[
-                                homeStyles.infoSectionContainer,
-                                plantStyles.articlesParent,
-                                { marginHorizontal: 10, marginBottom: 15, paddingTop: 10, paddingBottom: 0 },
-                            ]}
-                        >
-                            <View
-                                style={[
-                                    sensorStyles.titleView,
-                                    { flexDirection: index % 2 === 0 ? "row-reverse" : "row" },
-                                ]}
-                            >
-                                <Image source={pompIcon} style={pompStyles.pompIcon} />
-                                <Text style={sensorStyles.title}>Pomp {item.pompID === 1 ? "Links" : "Rechts"}</Text>
-                            </View>
-                            <View style={[plantStyles.articlesParent, { gap: 10, paddingHorizontal: 5, paddingTop: 5 }]}>
-                                {isAdmin ? 
-                                (
-                                <View style={plantStyles.articleItems}>
-                                    <Text style={[plantStyles.teksten, { fontFamily: "Afacad" }]}>Pomp Aanzetten:</Text>
-                                    <CustomSwitch
-                                        value={switchValues[item.pompID] || false}
-                                        onValueChange={(newValue) =>
-                                            handleSwitchChange(item.pompID, newValue)
-                                        }
-                                    />
-                                </View>
-                                ) : ("")}
-                                <View style={plantStyles.articleItems}>
-                                    <Text style={[plantStyles.teksten, { fontFamily: "Afacad" }]}>Actief:</Text>
-                                    <Text
+                <View style={[homeStyles.infoSectionContainer, plantStyles.articlesParent, styles.uitklapbaarMenu]}>
+                    <Text style={[plantenStyles.title, { margin: 0 }]}>Logboek</Text>
+                    <TouchableOpacity
+                        style={styles.subTitleMenu}
+                        onPress={() => setIsOpen(!isOpen)}
+                    >
+                        <Text style={styles.uitklapMenuTitle}>Foutmeldingen</Text>
+                        <View style={isOpen ? styles.triangleDown : styles.triangleUp} />
+                    </TouchableOpacity>
+                    {isOpen && (
+                    <View style={styles.parentFlatlistContainer}>
+                        <FlatList
+                            data={foutmeldingen}
+                            style={styles.binnenContainerFlatlist}
+                            showsVerticalScrollIndicator={false}
+                            onScroll={handleScroll}
+                            scrollEventThrottle={16}
+                            keyExtractor={(item) => item.foutmeldingID.toString()}
+                            renderItem={({ item, index }) => (
+                                <View style={styles.binnenContainerParent}>
+                                    <View
                                         style={[
-                                            plantStyles.teksten,
-                                            plantStyles.tweedeItem,
-                                            { fontFamily: "Afacad" },
+                                            styles.binnenContainer,
+                                            index === foutmeldingen.length - 1 && { borderBottomWidth: 0, paddingBottom: 0 },
                                         ]}
                                     >
-                                        {item.actief ? "Ja" : "Nee"}
-                                    </Text>
+                                        <Text style={[styles.innerTitle, { fontFamily: "Afacad" }]}>{item.melding}</Text>
+                                        <View style={styles.innerItem}>
+                                            <Text style={[styles.eersteTekst, { fontFamily: "Afacad" }]}>Apparaat ID:</Text>
+                                            <Text style={[styles.tweedeTekst, { fontFamily: "Afacad" }]}>{item.apparaatID}</Text>
+                                        </View>
+                                        <View style={styles.innerItem}>
+                                            <Text style={[styles.eersteTekst, { fontFamily: "Afacad" }]}>Tijdstip:</Text>
+                                            <Text style={[styles.tweedeTekst, { fontFamily: "Afacad" }]}>{item.tijdstip}</Text>
+                                        </View>
+                                        <View style={styles.innerItem}>
+                                            <Text style={[styles.eersteTekst, { fontFamily: "Afacad" }]}>Foutcode:</Text>
+                                            <Text style={[styles.tweedeTekst, { fontFamily: "Afacad" }]}>{item.foutcode}</Text>
+                                        </View>
+                                    </View>
                                 </View>
-                                <View style={plantStyles.articleItems}>
-                                    <Text style={[plantStyles.teksten, { fontFamily: "Afacad" }]}>Foutmelding:</Text>
-                                    <Text
-                                        style={[plantStyles.teksten, plantStyles.tweedeItem, { fontFamily: "Afacad" },]}
-                                    >
-                                        {item.foutmelding == null ? "n.v.t." : item.foutmelding}
-                                    </Text>
+                            )}
+                            ListEmptyComponent={
+                                <View style={{ padding: 20 }}>
+                                    <Text style={{ textAlign: "center" }}>Geen foutmeldingen gevonden.</Text>
                                 </View>
-                                <View style={plantStyles.articleItems}>
-                                    <Text style={[plantStyles.teksten, { fontFamily: "Afacad" }]}>Uptime:</Text>
-                                    <Text
-                                        style={[plantStyles.teksten, plantStyles.tweedeItem, { fontFamily: "Afacad" },]}
-                                    >
-                                        {item.uptime}%
-                                    </Text>
-                                </View>
-                                <View style={plantStyles.articleItems}>
-                                    <Text style={[plantStyles.teksten, { fontFamily: "Afacad" }]}>Waterverbruik:</Text>
-                                    <Text
-                                        style={[plantStyles.teksten, plantStyles.tweedeItem, { fontFamily: "Afacad" },]}
-                                    >
-                                        {item.waterverbruikPerDagInLiters}L per dag
-                                    </Text>
-                                </View>
-                            </View>
+                            }
+                        />
+                        <View style={styles.scrollbarTrack}>
+                            <View style={[styles.scrollbarThumb, { top: scrollPosition }]} />
                         </View>
+                    </View>
                     )}
-                />
+                {/* </View> */}
+                {/* <View style={[homeStyles.infoSectionContainer, plantStyles.articlesParent, styles.uitklapbaarMenu]}> */}
+                <TouchableOpacity
+    style={styles.subTitleMenu}
+    onPress={() => setIsWijzigingenOpen(!isWijzigingenOpen)}
+>
+    <Text style={styles.uitklapMenuTitle}>Wijzigingen</Text>
+    <View style={isWijzigingenOpen ? styles.triangleDown : styles.triangleUp} />
+</TouchableOpacity>
+
+                    {isOpen && (
+                    <View style={styles.parentFlatlistContainer}>
+                        <FlatList
+    data={wijzingen}
+    style={styles.binnenContainerFlatlist}
+    showsVerticalScrollIndicator={false}
+    keyExtractor={(item) => item.wijzigingID.toString()}
+    renderItem={({ item, index }) => (
+        <View style={styles.binnenContainerParent}>
+            <View
+                style={[
+                    styles.binnenContainer,
+                    index === wijzingen.length - 1 && { borderBottomWidth: 0, paddingBottom: 0 },
+                ]}
+            >
+                <Text style={[styles.innerTitle, { fontFamily: "Afacad" }]}>{item.wijziging}</Text>
+                <View style={styles.innerItem}>
+                    <Text style={[styles.eersteTekst, { fontFamily: "Afacad" }]}>Naam:</Text>
+                    <Text style={[styles.tweedeTekst, { fontFamily: "Afacad" }]}>{item.apparaat}</Text>
+                </View>
+                <View style={styles.innerItem}>
+                    <Text style={[styles.eersteTekst, { fontFamily: "Afacad" }]}>Apparaat ID:</Text>
+                    <Text style={[styles.tweedeTekst, { fontFamily: "Afacad" }]}>{item.apparaatID}</Text>
+                </View>
+                <View style={styles.innerItem}>
+                    <Text style={[styles.eersteTekst, { fontFamily: "Afacad" }]}>Tijdstip:</Text>
+                    <Text style={[styles.tweedeTekst, { fontFamily: "Afacad" }]}>{item.tijdstip}</Text>
+                </View>
+            </View>
+        </View>
+    )}
+    ListEmptyComponent={
+        <View style={{ padding: 20 }}>
+            <Text style={{ textAlign: "center" }}>Geen wijzigingen gevonden.</Text>
+        </View>
+    }
+/>
+
+                        <View style={styles.scrollbarTrack}>
+                            <View style={[styles.scrollbarThumb, { top: scrollPosition }]} />
+                        </View>
+                    </View>
+                    )}
+                </View>
             </View>
             <ExpandableMenu />
         </Background>
+        // </ProtectedRoute>
     );
 };
 
-export const pompStyles = StyleSheet.create({
-    pompIcon: {
-        width: 40,
-        height: 40,
-        marginHorizontal: 10,
+const styles = StyleSheet.create({
+    uitklapbaarMenu:
+    { 
+        marginHorizontal: 10, 
+        marginBottom: 15, 
+        paddingTop: 10, 
+        paddingBottom: 25, 
+        gap: 0 
     },
+    uitklapMenuTitle:
+    { 
+        fontSize: 20, 
+        color: "white", 
+        fontWeight: "bold", 
+        marginRight: 10 
+    },
+    containerTitle:
+    { 
+        borderBottomWidth: 3, 
+        borderColor: Colors.light.primary, 
+    },
+    parentFlatlistContainer:
+    {
+        flexDirection: "row", 
+        flex: 1, 
+        backgroundColor: "rgba(221, 245, 222, 0.5)"
+        // backgroundColor: "red",
+    },
+    binnenContainerParent:
+    {
+        paddingVertical: 5, 
+        paddingHorizontal: 15, 
+    },
+    binnenContainer:
+    { 
+        // backgroundColor: "rgba(221, 245, 222, 0.5)"
+        borderBottomWidth: 3, 
+        borderColor: Colors.light.primary, 
+        gap: 1, 
+        paddingBottom: 10
+    },
+    binnenContainerFlatlist:
+    { 
+        // backgroundColor: "white" 
+        maxHeight: 250,
+    },
+    innerTitle:
+    {
+        fontWeight: "bold",
+        fontSize: 20,
+        color: "#353535"
+    },
+    innerItem:
+    {
+        flexDirection: "row",
+        gap: 5,
+    },
+    eersteTekst:
+    {
+        fontSize: 20,
+        color: "darkgray",
+    },
+    tweedeTekst:
+    {
+        fontWeight: "bold",
+        fontSize: 20,
+        color: "#9C9C9C",
+    },
+    triangleUp: 
+    {
+        width: 0,
+        height: 0,
+        borderLeftWidth: 13,
+        borderRightWidth: 13,
+        borderBottomWidth: 20,
+        borderLeftColor: "transparent",
+        borderRightColor: "transparent",
+        borderBottomColor: Colors.light.text, 
+    },
+    triangleDown: 
+    {
+        width: 0,
+        height: 0,
+        borderLeftWidth: 13,
+        borderRightWidth: 13,
+        borderTopWidth: 20,
+        borderLeftColor: "transparent",
+        borderRightColor: "transparent",
+        borderTopColor: Colors.light.text,
+    },
+    subTitleMenu:
+    { 
+        flexDirection: "row", 
+        alignItems: "center", 
+        backgroundColor: "#ABD3AE", 
+        justifyContent: "space-between", 
+        paddingHorizontal: 10, 
+        paddingVertical: 5, 
+        borderTopLeftRadius: 10, 
+        borderTopRightRadius: 10, 
+        marginTop: 20 
+    },
+    scrollbarTrack: {
+        width: 12,
+        height: 250,
+        marginHorizontal: 15,
+        backgroundColor: "white",
+        borderRadius: 15,
+        position: "relative",
+        borderColor: Colors.light.primary,
+        borderWidth: 2,
+        margin: 10,
+    },
+    scrollbarThumb: {
+        width: 8,
+        height: 45,
+        backgroundColor: Colors.light.text,
+        borderRadius: 15,
+        position: "absolute",
+    },
+    
+    
 });
 
-export default Pompen;
+export default Data;
