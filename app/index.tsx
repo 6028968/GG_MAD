@@ -21,7 +21,8 @@ export default function LoginScreen()
     });
 
 
-    if (!fontsLoaded) {
+    if (!fontsLoaded) 
+    {
         return null;        
     }
 

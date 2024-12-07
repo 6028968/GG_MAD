@@ -1,23 +1,5 @@
-// import { WEER_API_KEY } from "@env";
+import { LiveWeather, WeatherForecast, WeatherResponse } from "../interfaces/customInterfaces";
 
-interface LiveWeather {
-    plaats: string; 
-    temp: string; 
-    samenv: string;
-}
-
-interface WeatherForecast {
-    dag: string; 
-    verwachting: string; 
-    temp?: string; 
-    min_temp: number;
-    max_temp: number;
-}
-
-interface WeatherResponse {
-    liveweer?: LiveWeather[]; 
-    wk_verw?: WeatherForecast[]; 
-}
 
 export const getWeatherData = async (): Promise<WeatherResponse | null> => 
 {

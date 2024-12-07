@@ -5,7 +5,7 @@ import { homeStyles } from "@/constants/HomeStyles";
 import Background from "@/components/Background";
 import ExpandableMenu from "@/components/MenuDownUnder";
 import { useFonts } from "expo-font";
-import { styles } from "@/constants/PlantStyles";
+import { plantStyles } from "@/constants/PlantStyles";
 import bcrypt from "bcryptjs";
 import { LoginStyles } from "@/constants/LoginStyles";
 import { GlobalStyles } from "@/constants/GlobalStyles";
@@ -21,16 +21,16 @@ const CustomSwitch: React.FC<CustomSwitchProps> = ({ value, onValueChange }) => 
     return (
         <TouchableOpacity
             style={[
-                styles.switchContainer,
-                value ? styles.switchOn : styles.switchOff,
+                plantStyles.switchContainer,
+                value ? plantStyles.switchOn : plantStyles.switchOff,
             ]}
             onPress={() => onValueChange(!value)}
             activeOpacity={0.8}
         >
             <View
                 style={[
-                    styles.thumb,
-                    value ? styles.thumbOn : styles.thumbOff,
+                    plantStyles.thumb,
+                    value ? plantStyles.thumbOn : plantStyles.thumbOff,
                 ]}
             />
         </TouchableOpacity>
@@ -164,32 +164,32 @@ const Instellingen: React.FC = () => {
     return (
         <Background>
             <ScrollView contentContainerStyle={GlobalStyles.scrollViewContent}>
-                <View style={styles.container}>
-                    <View style={[homeStyles.infoSectionContainer, styles.articlesParent]}>
-                        <Text style={[styles.articleTitle, styles.title, { fontFamily: "Akaya" }]}>
+                <View style={plantStyles.container}>
+                    <View style={[homeStyles.infoSectionContainer, plantStyles.articlesParent]}>
+                        <Text style={[plantStyles.articleTitle, plantStyles.title, { fontFamily: "Akaya" }]}>
                             Instellingen
                         </Text>
-                        <View style={styles.articleItems}>
-                            <Text style={[styles.teksten, { fontFamily: "Afacad" }]}>Gebruikersnaam:</Text>
-                            <Text style={[styles.teksten, styles.tweedeItem, { fontFamily: "Afacad" }]}>
+                        <View style={plantStyles.articleItems}>
+                            <Text style={[plantStyles.teksten, { fontFamily: "Afacad" }]}>Gebruikersnaam:</Text>
+                            <Text style={[plantStyles.teksten, plantStyles.tweedeItem, { fontFamily: "Afacad" }]}>
                                 {capitalizeFirstLetter(user?.username || "Onbekend")}
                             </Text>
                         </View>
-                        <View style={styles.articleItems}>
-                            <Text style={[styles.teksten, { fontFamily: "Afacad" }]}>Account aangemaakt:</Text>
-                            <Text style={[styles.teksten, styles.tweedeItem, { fontFamily: "Afacad" }]}>
+                        <View style={plantStyles.articleItems}>
+                            <Text style={[plantStyles.teksten, { fontFamily: "Afacad" }]}>Account aangemaakt:</Text>
+                            <Text style={[plantStyles.teksten, plantStyles.tweedeItem, { fontFamily: "Afacad" }]}>
                                 {user?.aangemaakt || "Onbekend"}
                             </Text>
                         </View>
-                        <View style={styles.articleItems}>
-                            <Text style={[styles.teksten, { fontFamily: "Afacad" }]}>Gebruikersrol:</Text>
-                            <Text style={[styles.teksten, styles.tweedeItem, { fontFamily: "Afacad" }]}>
+                        <View style={plantStyles.articleItems}>
+                            <Text style={[plantStyles.teksten, { fontFamily: "Afacad" }]}>Gebruikersrol:</Text>
+                            <Text style={[plantStyles.teksten, plantStyles.tweedeItem, { fontFamily: "Afacad" }]}>
                                 {user?.role || "Onbekend"}
                             </Text>
                         </View>
                     </View>
-                    <View style={[homeStyles.infoSectionContainer, styles.articlesParent]}>
-                        <Text style={[styles.articleTitle, styles.title, { fontFamily: "Akaya", marginBottom: 15 }]}>
+                    <View style={[homeStyles.infoSectionContainer, plantStyles.articlesParent]}>
+                        <Text style={[plantStyles.articleTitle, plantStyles.title, { fontFamily: "Akaya", marginBottom: 15 }]}>
                             Accountgegevens
                         </Text>
                         <View>
@@ -249,14 +249,14 @@ const Instellingen: React.FC = () => {
                             <Text style={[GlobalStyles.buttonTekst, { fontFamily: "Akaya" }]}>Wijzigen</Text>
                         </TouchableOpacity>
                     </View>
-                    <View style={[homeStyles.infoSectionContainer, styles.articlesParent]}>
-                        <View style={styles.borderContainer}>
-                            <View style={styles.articleItems}>
-                                <Text style={[styles.teksten, { fontFamily: "Afacad" }]}>Meldingen ontvangen:</Text>
+                    <View style={[homeStyles.infoSectionContainer, plantStyles.articlesParent]}>
+                        <View style={plantStyles.borderContainer}>
+                            <View style={plantStyles.articleItems}>
+                                <Text style={[plantStyles.teksten, { fontFamily: "Afacad" }]}>Meldingen ontvangen:</Text>
                                 <CustomSwitch value={switchValue} onValueChange={setSwitchValue} />
                             </View>
                         </View>
-                        <View style={styles.articleItems}>
+                        <View style={plantStyles.articleItems}>
                             <TouchableOpacity style={[]} onPress={deleteAccount}>
                                 <Text style={GlobalStyles.gevaarTekst}>Verwijder account</Text>
                             </TouchableOpacity>

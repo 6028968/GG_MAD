@@ -10,7 +10,7 @@ import Background from "@/components/Background";
 import ExpandableMenu from "../components/MenuDownUnder"; 
 import Colors from "@/constants/Colors";
 import { useFonts } from "expo-font";
-import { styles } from "@/constants/PlantenStyles"
+import { plantenStyles } from "@/constants/PlantenStyles"
 
 const iconMap: Record<string, Record<string, any>> = {
     fruit: {
@@ -52,7 +52,7 @@ const PlantItemComponent: React.FC<{ plant: PlantItem | null }> = ({ plant }) =>
     const router = useRouter();
 
     if (!plant) {
-        return <View style={[styles.placeholderItem]} />;
+        return <View style={[plantenStyles.placeholderItem]} />;
     }
 
     const [fontsLoaded] = useFonts({
@@ -68,7 +68,7 @@ const PlantItemComponent: React.FC<{ plant: PlantItem | null }> = ({ plant }) =>
         <TouchableOpacity
             style={[
                 homeStyles.itemContainer,
-                plant.aanwezig ? styles.activeItem : styles.inactiveItem,
+                plant.aanwezig ? plantenStyles.activeItem : plantenStyles.inactiveItem,
             ]}
             onPress={() => router.push(`/plant/${plant.id}`)}
         >
@@ -94,7 +94,7 @@ const PlantItemComponent: React.FC<{ plant: PlantItem | null }> = ({ plant }) =>
                 </Text>
                 <Text
                     style={[
-                        styles.plantDetails,
+                        plantenStyles.plantDetails,
                         { fontFamily: "Afacad", color: textColor },
                     ]}
                 >
@@ -139,8 +139,8 @@ const PlantList: React.FC = () => {
     return (
         <ProtectedRoute>
             <Background>
-                <View style={styles.container}>
-                    <Text style={styles.title}>Alle Planten</Text>
+                <View style={plantenStyles.container}>
+                    <Text style={plantenStyles.title}>Alle Planten</Text>
                     <FlatList
                         data={plants}
                         renderItem={({ item }) => <PlantItemComponent plant={item} />}
@@ -153,22 +153,22 @@ const PlantList: React.FC = () => {
                         onScroll={handleScroll} 
                         scrollEventThrottle={16}
                     />
-                    <View style={styles.scrollbarTrack}>
-                        <View style={[styles.scrollbarThumb, { top: scrollPosition }]} />
+                    <View style={plantenStyles.scrollbarTrack}>
+                        <View style={[plantenStyles.scrollbarThumb, { top: scrollPosition }]} />
                     </View>
                 </View>
-                <View style={styles.footer}>
-                    <TouchableOpacity style={styles.footerButton}>
-                        <Text style={styles.footerButtonText}>+</Text>
+                <View style={plantenStyles.footer}>
+                    <TouchableOpacity style={plantenStyles.footerButton}>
+                        <Text style={plantenStyles.footerButtonText}>+</Text>
                     </TouchableOpacity>
-                    <TouchableOpacity style={styles.footerButton}>
+                    <TouchableOpacity style={plantenStyles.footerButton}>
                         <MaterialCommunityIcons
                             name="cog"
                             size={50}
                             color={Colors.light.primary}
                         />
                     </TouchableOpacity>
-                    <TouchableOpacity style={styles.footerButton}>
+                    <TouchableOpacity style={plantenStyles.footerButton}>
                         <MaterialCommunityIcons
                             name="magnify"
                             size={50}

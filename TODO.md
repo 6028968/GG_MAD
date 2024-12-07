@@ -9,7 +9,7 @@
 
 ## --- Authenticatie ---
 
-- [ ] Zorg dat de admin in de AsyncStorage opgeslagen wordt
+- [x] Zorg dat de admin in de AsyncStorage opgeslagen wordt
 
 ## --- Planten ---
 
@@ -26,6 +26,8 @@
 - [ ] Evnetueel een modal maken of je echt je gegevens/account wissen of database wissen wilt uitvoeren
 
 ## --- Sensoren ---
+
+- [ ] Misschien een optie dat de beheerder een sensor toe kan voegen
 
 ## --- Pompen ---
 

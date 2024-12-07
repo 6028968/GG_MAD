@@ -5,7 +5,7 @@ const { width } = Dimensions.get("window");
 const margin = 5; 
 const itemWidth = (width / 5) - (margin * 3);
 
-export const styles = StyleSheet.create({
+export const plantenStyles = StyleSheet.create({
     container: {
         padding: 25,
         borderWidth: 3,

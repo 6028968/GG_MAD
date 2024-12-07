@@ -2,7 +2,7 @@
 // $font-text: "Afacad", sans-serif;
 // $input-color: #3d743c;
 
-const Colors = {
+export const Colors = {
     light: {
     background: 'white',
     primary: 'rgba(171, 211, 174, 1)',

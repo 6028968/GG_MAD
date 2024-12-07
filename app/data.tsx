@@ -5,7 +5,7 @@ import { homeStyles } from "@/constants/HomeStyles";
 import Background from "@/components/Background";
 import ExpandableMenu from "@/components/MenuDownUnder";
 import { useFonts } from "expo-font";
-import { styles } from "@/constants/PlantStyles";
+import { plantStyles } from "@/constants/PlantStyles";
 
 const Data: React.FC = () => {
     const [loading, setLoading] = useState(true);
@@ -18,7 +18,8 @@ const Data: React.FC = () => {
 
     useEffect(() => {
         const fetchUserRole = async () => {
-            try {
+            try 
+            {
                 const storedAuth = await AsyncStorage.getItem("8JUhZ1hcFU1xFzYwf8CeWeNzYpf5ArUb");
                 if (storedAuth) {
                     const { user } = JSON.parse(storedAuth);
@@ -26,9 +27,13 @@ const Data: React.FC = () => {
                         setIsAdmin(true);
                     }
                 }
-            } catch (error) {
+            } 
+            catch (error) 
+            {
                 console.error("Fout bij het ophalen van de gebruikersrol:", error);
-            } finally {
+            } 
+            finally 
+            {
                 setLoading(false); 
             }
         };
@@ -36,15 +41,16 @@ const Data: React.FC = () => {
         fetchUserRole();
     }, []);
 
-    if (!fontsLoaded || loading) {
+    if (!fontsLoaded || loading) 
+    {
         return <ActivityIndicator size="large" />;
     }
 
     return (
         <Background>
-            <View style={styles.container}>
-                <View style={[homeStyles.infoSectionContainer, styles.articlesParent]}>
-                    <Text style={styles.title}>
+            <View style={plantStyles.container}>
+                <View style={[homeStyles.infoSectionContainer, plantStyles.articlesParent]}>
+                    <Text style={plantStyles.title}>
                         {isAdmin ? "Beheerdersinstellingen" : "Gebruikersinstellingen"}
                     </Text>
                 </View>

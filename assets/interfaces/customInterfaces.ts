@@ -39,3 +39,52 @@ export interface WeatherForecast {
     min_temp?: number; 
     avg_temp?: string;
 }
+
+export interface WeatherResponse {
+    liveweer?: LiveWeather[]; 
+    wk_verw?: WeatherForecast[]; 
+}
+
+
+// Kas data interfaces
+export interface Pomp {
+    pompID: number;
+    actief: boolean;
+    foutmelding: number | null;
+    uptime: number;
+    waterverbruikPerDagInLiters: number;
+    pompAanzetten: boolean;
+}
+
+export interface Sensor {
+    sensorID: number;
+    actief: boolean;
+    deviceNaam: string;
+    foutmelding: number | null;
+    uptime: number;
+    locatie: string;
+    grondvochtigheid: number;
+    dataOntvangen: string;
+}
+
+export interface Foutmelding {
+    apparaatSoort: string;
+    apparaat: string;
+    melding: string;
+    apparaatID: number;
+    tijdstip: string;
+    foutcode: number;
+}
+
+export interface Logboek {
+    foutmeldingen: Foutmelding[];
+}
+
+export interface KasResponse {
+    pompen: {
+        pompLinks: Pomp;
+        pompRechts: Pomp;
+    };
+    sensoren: Record<string, Sensor>;
+    logboek: Logboek;
+}
