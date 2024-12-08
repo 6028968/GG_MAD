@@ -118,6 +118,11 @@ const PlantList: React.FC = () => {
     const [dropdownOpen, setDropdownOpen] = useState(false);
     const [isLimitModalVisible, setLimitModalVisible] = useState(false);
     const [fullSide, setFullSide] = useState<"links" | "rechts" | null>(null);
+    const [filterSoort, setFilterSoort] = useState<string | null>(null);
+    const [filterKant, setFilterKant] = useState<"links" | "rechts" | null>(null);
+    const [filterAanwezig, setFilterAanwezig] = useState<boolean | null>(null);
+    const [isFilterModalVisible, setFilterModalVisible] = useState(false);
+    const [isScrollbarVisible, setScrollbarVisible] = useState(false);
 
     useEffect(() => {
         const loadPlants = async () => {
@@ -126,15 +131,29 @@ const PlantList: React.FC = () => {
                 const parsedPlants: PlantItem[] = savedPlants ? JSON.parse(savedPlants) : [];
                 const totalItems = 20;
                 const placeholders = Array(totalItems - parsedPlants.length).fill(null);
-                const updatedPlants = [...parsedPlants, ...placeholders]; 
+                const updatedPlants = [...parsedPlants, ...placeholders];
                 setPlants(updatedPlants);
             } catch (error) {
                 console.error("Fout bij het laden van planten:", error);
             }
         };
-
+    
         loadPlants();
     }, []);
+
+    const filteredPlants = plants.filter((plant) => {
+        if (!plant) return false;
+    
+        const matchSoort = filterSoort ? plant.soort === filterSoort : true;
+        const matchKant = filterKant ? plant.kant === filterKant : true;
+        const matchAanwezig = filterAanwezig !== null ? plant.aanwezig === filterAanwezig : true;
+    
+        return matchSoort && matchKant && matchAanwezig;
+    });
+    
+    useEffect(() => {
+        setScrollbarVisible(filteredPlants.length >= 7);
+    }, [filteredPlants]);    
 
     const handleAddPlant = async () => 
         {
@@ -207,7 +226,7 @@ const PlantList: React.FC = () => {
                 <View style={plantenStyles.container}>
                     <Text style={plantenStyles.title}>Alle Planten</Text>
                     <FlatList
-                        data={plants}
+                        data={filteredPlants}
                         renderItem={({ item }) => <PlantItemComponent plant={item} />}
                         keyExtractor={(item, index) => (item ? item.id.toString() : `placeholder-${index}`)}
                         contentContainerStyle={{
@@ -218,9 +237,11 @@ const PlantList: React.FC = () => {
                         onScroll={handleScroll} 
                         scrollEventThrottle={16}
                     />
-                    <View style={plantenStyles.scrollbarTrack}>
-                        <View style={[plantenStyles.scrollbarThumb, { top: scrollPosition }]} />
-                    </View>
+                    {isScrollbarVisible && (
+                        <View style={plantenStyles.scrollbarTrack}>
+                            <View style={[plantenStyles.scrollbarThumb, { top: scrollPosition }]} />
+                        </View>
+                    )}
                 </View>
                 <View style={plantenStyles.footer}>
                 <TouchableOpacity
@@ -236,12 +257,8 @@ const PlantList: React.FC = () => {
                             color={Colors.light.primary}
                         />
                     </TouchableOpacity>
-                    <TouchableOpacity style={plantenStyles.footerButton}>
-                        <MaterialCommunityIcons
-                            name="magnify"
-                            size={50}
-                            color={Colors.light.primary}
-                        />
+                    <TouchableOpacity style={plantenStyles.footerButton} onPress={() => setFilterModalVisible(true)}>
+                        <MaterialCommunityIcons name="magnify" size={50} color={Colors.light.primary} />
                     </TouchableOpacity>
                 </View>
                 <ExpandableMenu />
@@ -419,6 +436,96 @@ const PlantList: React.FC = () => {
                         </View>
                     </View>
                 </Modal>
+                <Modal
+                    animationType="slide"
+                    transparent={true}
+                    visible={isFilterModalVisible}
+                    onRequestClose={() => setFilterModalVisible(false)}
+                >
+                    <View style={homeStyles.modalOverlay}>
+                        <View style={homeStyles.outerModalContainer}>
+                            <View style={homeStyles.modalContainer}>
+                                <Text style={homeStyles.modalTitle}>Filters</Text>
+                                <Text style={homeStyles.inputText}>Soort:</Text>
+                                <DropDownPicker
+                                    open={dropdownOpen}
+                                    setOpen={setDropdownOpen}
+                                    value={filterSoort}
+                                    setValue={setFilterSoort}
+                                    items={[
+                                        { label: "Fruit", value: "Fruit" },
+                                        { label: "Groente", value: "Groente" },
+                                        { label: "Kruiden", value: "Kruiden" },
+                                        { label: "Schimmel", value: "Schimmel" },
+                                        { label: "Overig", value: "Overig" },
+                                    ]}
+                                    style={[homeStyles.input, { height: 10, borderBottomWidth: 2, borderWidth: 0, marginBottom: 0, borderRadius: 0 }]}
+                                    placeholder="Selecteer een soort"
+                                />
+                                <View style={{ marginVertical: 10, flexDirection: "row", justifyContent: "space-between" }}>
+                                    <View>
+                                    <Text style={homeStyles.inputText}>Kant:</Text>
+                                        <View style={{ flexDirection: "column", alignItems: "flex-start", gap: 10 }}>
+                                            <TouchableOpacity
+                                                style={[
+                                                    plantenStyles.bulletButton,
+                                                    filterKant === "links" && plantenStyles.activeBullet,
+                                                ]}
+                                                onPress={() => setFilterKant("links")}
+                                            >
+                                                <View style={plantenStyles.bulletCircle}>
+                                                    {filterKant === "links" && <View style={plantenStyles.activeCircle} />}
+                                                </View>
+                                                <Text style={[plantenStyles.bulletText, { fontFamily: "Akaya", color: "rgb(46, 86, 81)" }]}>
+                                                    Links
+                                                </Text>
+                                            </TouchableOpacity>
+                                            <TouchableOpacity
+                                                style={[
+                                                    plantenStyles.bulletButton,
+                                                    filterKant === "rechts" && plantenStyles.activeBullet,
+                                                ]}
+                                                onPress={() => setFilterKant("rechts")}
+                                            >
+                                                <View style={plantenStyles.bulletCircle}>
+                                                    {filterKant === "rechts" && <View style={plantenStyles.activeCircle} />}
+                                                </View>
+                                                <Text style={[plantenStyles.bulletText, { fontFamily: "Akaya", color: "rgb(46, 86, 81)" }]}>
+                                                    Rechts
+                                                </Text>
+                                            </TouchableOpacity>
+                                        </View>
+                                    </View>
+                                </View>                                
+                                <Text style={homeStyles.inputText}>Aanwezig:</Text>
+                                <CustomSwitch
+                                    value={filterAanwezig === true} 
+                                    onValueChange={(value) => setFilterAanwezig(value)} 
+                                />
+                                <View style={homeStyles.buttonContainer}>
+                                    <TouchableOpacity
+                                        style={[homeStyles.button, homeStyles.addButton]}
+                                        onPress={() => setFilterModalVisible(false)}
+                                    >
+                                        <Text style={{ fontFamily: "Akaya", color: "white", fontSize: 20 }}>Toepassen</Text>
+                                    </TouchableOpacity>
+                                    <TouchableOpacity
+                                        style={[homeStyles.button, homeStyles.cancelButton]}
+                                        onPress={() => {
+                                            setFilterSoort(null); 
+                                            setFilterKant(null); 
+                                            setFilterAanwezig(null); 
+                                            setFilterModalVisible(false); 
+                                        }}
+                                    >
+                                        <Text style={{ fontFamily: "Akaya", color: "white", fontSize: 20 }}>Reset</Text>
+                                    </TouchableOpacity>
+                                </View>
+                            </View>
+                        </View>
+                    </View>
+                </Modal>
+                
             </Background>
         </ProtectedRoute>
     );
