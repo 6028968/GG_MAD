@@ -87,9 +87,44 @@ export interface Wijziging
     wijzigingID: number;
 }
 
+export interface Bijzonderheid
+{
+    apparaat: string;
+    apparaatID: number;
+    bijzonderheid: string;
+    bijzonderheidID: number;
+    tijdstip: string;
+}
+
 export interface Logboek {
     foutmeldingen: Foutmelding[];
     wijzigingen: Wijziging[];
+    bijzonderheden: Bijzonderheid[];
+}
+
+export interface Plantdata
+{
+    beschrijving: string;
+    plantnaam: string;
+    plantID: number;
+    plantdataID: number;
+    reden: string;
+    tijdstip: string;
+}
+
+export interface Sensordata
+{
+    apparaat: string;
+    apparaatID: number;
+    sensordataID: number;
+    tijdstip: string;
+    waarde: number;
+}
+
+export interface Overzicht
+{
+    plantdata: Plantdata[];
+    sensordata: Sensordata[];
 }
 
 export interface KasResponse {

@@ -1,34 +1,36 @@
 import React, { useEffect, useState } from "react";
-import { FlatList, Text, View, TouchableOpacity, StyleSheet, Image } from "react-native";
+import { FlatList, Text, View, TouchableOpacity } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import ProtectedRoute from "../components/ProtectedRoute";
-import { useRouter } from "expo-router";
-import { MaterialCommunityIcons } from "@expo/vector-icons";
-import { PlantItem } from "@/assets/types/plantTypes"
 import { homeStyles } from "@/constants/HomeStyles"
 import Background from "@/components/Background"; 
 import ExpandableMenu from "../components/MenuDownUnder"; 
-import Colors from "@/constants/Colors";
 import { useFonts } from "expo-font";
 import { plantenStyles } from "@/constants/PlantenStyles"
-import { Foutmelding, Wijziging } from "@/assets/interfaces/customInterfaces";
+import { Foutmelding, Wijziging, Bijzonderheid, Sensordata, Plantdata } from "@/assets/interfaces/customInterfaces";
 import { plantStyles } from "@/constants/PlantStyles";
 import { sensorStyles } from "@/constants/SensorStyles";
-
-const capitalizeFirstLetter = (string: string): string => {
-    return string.charAt(0).toUpperCase() + string.slice(1).toLowerCase();
-}
+import { ScrollView } from "react-native-gesture-handler";
+import { dataStyles } from "@/constants/DataStyles";
+import ProtectedRoute from "@/components/ProtectedRoute";
 
 const Data: React.FC = () => {
-    // const [plants, setPlants] = useState<(PlantItem | null)[]>([]);
-    // const [scrollPosition, setScrollPosition] = useState(0);
     const [loading, setLoading] = useState(true);
     const [isAdmin, setIsAdmin] = useState(false);
-    const [foutmeldingen, setFoutmelding] = useState<Foutmelding[]>([]);
-    const [wijzingen, setWijziging] = useState<Wijziging[]>([])
     const [error, setError] = useState<string | null>(null);
-    const [isOpen, setIsOpen] = useState(false);
+
+    const [foutmeldingen, setFoutmelding] = useState<Foutmelding[]>([]);
+    const [wijzingen, setWijziging] = useState<Wijziging[]>([]);
+    const [bijzonderheden, setBijzonderheden] = useState<Bijzonderheid[]>([])
+
+    const [sensordata, setSensordata] = useState<Sensordata[]>([])
+    const [plantdata, setPlantdata] = useState<Plantdata[]>([])
+
+    const [isFoutmeldingenOpen, setIsFoutmeldingenOpen] = useState(false);
     const [isWijzigingenOpen, setIsWijzigingenOpen] = useState(false);
+    const [isBijzonderheidOpen, setIsBijzonderheidOpen] = useState(false);
+
+    const [isSensordataOpen, setIsSensordataOpen] = useState(false);
+    const [isPlantdataOpen, setIsPlantdataOpen] = useState(false);
 
     const [fontsLoaded] = useFonts({
         "Afacad": require("../assets/fonts/Afacad-Regular.ttf"),
@@ -81,7 +83,7 @@ const Data: React.FC = () => {
                         throw new Error(`Fout bij het ophalen van wijzigingen: ${response.statusText}`);
                     }
                     const data = await response.json();
-                    setWijziging(data.logboek.wijzigingen); // Correct gebruik van setWijziging
+                    setWijziging(data.logboek.wijzigingen);
                 } 
                 catch (error) {
                     console.error("Fout bij het ophalen van wijziginggegevens:", error);
@@ -90,268 +92,408 @@ const Data: React.FC = () => {
                 finally {
                     setLoading(false);
                 }
-            };            
+            };                       
+
+            const fetchBijzonderheidData = async () => {
+                try {
+                    const response = await fetch("http://localhost:3000/fetch-data");
+                    if (!response.ok) {
+                        throw new Error(`Fout bij het ophalen van bijzonderheden: ${response.statusText}`);
+                    }
+                    const data = await response.json();
+                    setBijzonderheden(data.logboek.bijzonderheden);
+                } 
+                catch (error) {
+                    console.error("Fout bij het ophalen van bijzinderheden:", error);
+                    setError("Kan bijzonderheden niet ophalen.");
+                } 
+                finally {
+                    setLoading(false);
+                }
+            };   
+
+            const fetchSensordata = async () => {
+                try {
+                    const response = await fetch("http://localhost:3000/fetch-data");
+                    if (!response.ok) {
+                        throw new Error(`Fout bij het ophalen van sensordata: ${response.statusText}`);
+                    }
+                    const data = await response.json();
+                    setSensordata(data.overzicht.sensordata);
+                } 
+                catch (error) {
+                    console.error("Fout bij het ophalen van bijzinderheden:", error);
+                    setError("Kan sensordata niet ophalen.");
+                } 
+                finally {
+                    setLoading(false);
+                }
+            };   
+
+            const fetchPlantdata = async () => {
+                try {
+                    const response = await fetch("http://localhost:3000/fetch-data");
+                    if (!response.ok) {
+                        throw new Error(`Fout bij het ophalen van plantdata: ${response.statusText}`);
+                    }
+                    const data = await response.json();
+                    setPlantdata(data.overzicht.plantdata);
+                } 
+                catch (error) {
+                    console.error("Fout bij het ophalen van bijzinderheden:", error);
+                    setError("Kan plantdata niet ophalen.");
+                } 
+                finally {
+                    setLoading(false);
+                }
+            };   
 
             fetchUserRole();
             fetchFoutmeldingData();
             fetchWijzingenData();
+            fetchBijzonderheidData();
+            fetchSensordata();
+            fetchPlantdata();
     }, []);
-
-    const [scrollPosition, setScrollPosition] = useState(0);
-    const [scrollHeight, setScrollHeight] = useState(0);
     
-    const handleScroll = (event: any) => {
+    const [foutmeldingenScrollPosition, setFoutmeldingenScrollPosition] = useState(0);
+    const [wijzigingenScrollPosition, setWijzigingenScrollPosition] = useState(0);
+    const [bijzonderhedenScrollPosition, setBijzonderhedenScrollPosition] = useState(0);
+
+    const [sensordataScrollPosition, setSensordataScrollPosition] = useState(0);
+    const [plantdataScrollPosition, setPlantdataScrollPosition] = useState(0);
+
+    const handleFoutmeldingenScroll = (event: any) => {
         const offsetY = event.nativeEvent.contentOffset.y;
         const contentHeight = event.nativeEvent.contentSize.height;
         const viewHeight = event.nativeEvent.layoutMeasurement.height;
-    
+
         const totalScrollableHeight = contentHeight - viewHeight;
-        setScrollHeight(totalScrollableHeight);
-    
         const position = (offsetY / totalScrollableHeight) * (viewHeight - 50);
-        setScrollPosition(Math.max(0, position));
-    };    
+        setFoutmeldingenScrollPosition(Math.max(0, position));
+    };
+
+    const handleWijzigingenScroll = (event: any) => {
+        const offsetY = event.nativeEvent.contentOffset.y;
+        const contentHeight = event.nativeEvent.contentSize.height;
+        const viewHeight = event.nativeEvent.layoutMeasurement.height;
+
+        const totalScrollableHeight = contentHeight - viewHeight;
+        const position = (offsetY / totalScrollableHeight) * (viewHeight - 50);
+        setWijzigingenScrollPosition(Math.max(0, position));
+    };
+
+    const handleBijzonderhedenScroll = (event: any) => {
+        const offsetY = event.nativeEvent.contentOffset.y;
+        const contentHeight = event.nativeEvent.contentSize.height;
+        const viewHeight = event.nativeEvent.layoutMeasurement.height;
+
+        const totalScrollableHeight = contentHeight - viewHeight;
+        const position = (offsetY / totalScrollableHeight) * (viewHeight - 50);
+        setBijzonderhedenScrollPosition(Math.max(0, position));
+    };
+
+    const handleSensordataScroll = (event: any) => {
+        const offsetY = event.nativeEvent.contentOffset.y;
+        const contentHeight = event.nativeEvent.contentSize.height;
+        const viewHeight = event.nativeEvent.layoutMeasurement.height;
+
+        const totalScrollableHeight = contentHeight - viewHeight;
+        const position = (offsetY / totalScrollableHeight) * (viewHeight - 50);
+        setSensordataScrollPosition(Math.max(0, position));
+    };
+
+    const handlePlantdataScroll = (event: any) => {
+        const offsetY = event.nativeEvent.contentOffset.y;
+        const contentHeight = event.nativeEvent.contentSize.height;
+        const viewHeight = event.nativeEvent.layoutMeasurement.height;
+
+        const totalScrollableHeight = contentHeight - viewHeight;
+        const position = (offsetY / totalScrollableHeight) * (viewHeight - 50);
+        setPlantdataScrollPosition(Math.max(0, position));
+    };
 
     return (
-        // <ProtectedRoute>
-        <Background>
-            <View style={sensorStyles.mainContainer}>
-                <View style={[homeStyles.infoSectionContainer, plantStyles.articlesParent, styles.uitklapbaarMenu]}>
-                    <Text style={[plantenStyles.title, { margin: 0 }]}>Logboek</Text>
-                    <TouchableOpacity
-                        style={styles.subTitleMenu}
-                        onPress={() => setIsOpen(!isOpen)}
-                    >
-                        <Text style={styles.uitklapMenuTitle}>Foutmeldingen</Text>
-                        <View style={isOpen ? styles.triangleDown : styles.triangleUp} />
-                    </TouchableOpacity>
-                    {isOpen && (
-                    <View style={styles.parentFlatlistContainer}>
-                        <FlatList
-                            data={foutmeldingen}
-                            style={styles.binnenContainerFlatlist}
-                            showsVerticalScrollIndicator={false}
-                            onScroll={handleScroll}
-                            scrollEventThrottle={16}
-                            keyExtractor={(item) => item.foutmeldingID.toString()}
-                            renderItem={({ item, index }) => (
-                                <View style={styles.binnenContainerParent}>
-                                    <View
-                                        style={[
-                                            styles.binnenContainer,
-                                            index === foutmeldingen.length - 1 && { borderBottomWidth: 0, paddingBottom: 0 },
-                                        ]}
-                                    >
-                                        <Text style={[styles.innerTitle, { fontFamily: "Afacad" }]}>{item.melding}</Text>
-                                        <View style={styles.innerItem}>
-                                            <Text style={[styles.eersteTekst, { fontFamily: "Afacad" }]}>Apparaat ID:</Text>
-                                            <Text style={[styles.tweedeTekst, { fontFamily: "Afacad" }]}>{item.apparaatID}</Text>
-                                        </View>
-                                        <View style={styles.innerItem}>
-                                            <Text style={[styles.eersteTekst, { fontFamily: "Afacad" }]}>Tijdstip:</Text>
-                                            <Text style={[styles.tweedeTekst, { fontFamily: "Afacad" }]}>{item.tijdstip}</Text>
-                                        </View>
-                                        <View style={styles.innerItem}>
-                                            <Text style={[styles.eersteTekst, { fontFamily: "Afacad" }]}>Foutcode:</Text>
-                                            <Text style={[styles.tweedeTekst, { fontFamily: "Afacad" }]}>{item.foutcode}</Text>
+        <ProtectedRoute>
+            <Background>
+                <ScrollView style={sensorStyles.mainContainer}>
+                    <View style={[homeStyles.infoSectionContainer, plantStyles.articlesParent, dataStyles.uitklapbaarMenu]}>
+                        <Text style={[plantenStyles.title, { margin: 0 }]}>Logboek</Text>
+                        {/* FOUTMELDINGEN */}
+                        <TouchableOpacity
+                            style={[dataStyles.subTitleMenu, isFoutmeldingenOpen ? { borderTopLeftRadius: 10, borderTopRightRadius: 10, } : { borderRadius: 10 }]}
+                            onPress={() => setIsFoutmeldingenOpen(!isFoutmeldingenOpen)}
+                        >
+                            <Text style={dataStyles.uitklapMenuTitle}>Foutmeldingen</Text>
+                            <View style={isFoutmeldingenOpen ? dataStyles.triangleDown : dataStyles.triangleUp} />
+                        </TouchableOpacity>
+                        {isFoutmeldingenOpen && (
+                        <View style={dataStyles.parentFlatlistContainer}>
+                            <FlatList
+                                data={foutmeldingen}
+                                style={dataStyles.binnenContainerFlatlist}
+                                showsVerticalScrollIndicator={false}
+                                onScroll={handleFoutmeldingenScroll}
+                                scrollEventThrottle={16}
+                                keyExtractor={(item) => item.foutmeldingID.toString()}
+                                renderItem={({ item, index }) => (
+                                    <View style={dataStyles.binnenContainerParent}>
+                                        <View
+                                            style={[
+                                                dataStyles.binnenContainer,
+                                                index === foutmeldingen.length - 1 && { borderBottomWidth: 0, paddingBottom: 0 },
+                                            ]}
+                                        >
+                                            <Text style={[dataStyles.innerTitle, { fontFamily: "Afacad" }]}>{item.melding}</Text>
+                                            <View style={dataStyles.innerItem}>
+                                                <Text style={[dataStyles.eersteTekst, { fontFamily: "Afacad" }]}>Apparaat ID:</Text>
+                                                <Text style={[dataStyles.tweedeTekst, { fontFamily: "Afacad" }]}>{item.apparaatID}</Text>
+                                            </View>
+                                            <View style={dataStyles.innerItem}>
+                                                <Text style={[dataStyles.eersteTekst, { fontFamily: "Afacad" }]}>Tijdstip:</Text>
+                                                <Text style={[dataStyles.tweedeTekst, { fontFamily: "Afacad" }]}>{item.tijdstip}</Text>
+                                            </View>
+                                            <View style={dataStyles.innerItem}>
+                                                <Text style={[dataStyles.eersteTekst, { fontFamily: "Afacad" }]}>Foutcode:</Text>
+                                                <Text style={[dataStyles.tweedeTekst, { fontFamily: "Afacad" }]}>{item.foutcode}</Text>
+                                            </View>
                                         </View>
                                     </View>
-                                </View>
-                            )}
-                            ListEmptyComponent={
-                                <View style={{ padding: 20 }}>
-                                    <Text style={{ textAlign: "center" }}>Geen foutmeldingen gevonden.</Text>
-                                </View>
-                            }
-                        />
-                        <View style={styles.scrollbarTrack}>
-                            <View style={[styles.scrollbarThumb, { top: scrollPosition }]} />
+                                )}
+                                ListEmptyComponent={
+                                    <View style={{ padding: 20 }}>
+                                        <Text style={{ textAlign: "center" }}>Geen foutmeldingen gevonden.</Text>
+                                    </View>
+                                }
+                            />
+                            <View style={dataStyles.scrollbarTrack}>
+                                <View style={[dataStyles.scrollbarThumb, { top: foutmeldingenScrollPosition }]} />
+                            </View>
                         </View>
-                    </View>
-                    )}
-                {/* </View> */}
-                {/* <View style={[homeStyles.infoSectionContainer, plantStyles.articlesParent, styles.uitklapbaarMenu]}> */}
-                <TouchableOpacity
-    style={styles.subTitleMenu}
-    onPress={() => setIsWijzigingenOpen(!isWijzigingenOpen)}
->
-    <Text style={styles.uitklapMenuTitle}>Wijzigingen</Text>
-    <View style={isWijzigingenOpen ? styles.triangleDown : styles.triangleUp} />
-</TouchableOpacity>
-
-                    {isOpen && (
-                    <View style={styles.parentFlatlistContainer}>
-                        <FlatList
-    data={wijzingen}
-    style={styles.binnenContainerFlatlist}
-    showsVerticalScrollIndicator={false}
-    keyExtractor={(item) => item.wijzigingID.toString()}
-    renderItem={({ item, index }) => (
-        <View style={styles.binnenContainerParent}>
-            <View
-                style={[
-                    styles.binnenContainer,
-                    index === wijzingen.length - 1 && { borderBottomWidth: 0, paddingBottom: 0 },
-                ]}
-            >
-                <Text style={[styles.innerTitle, { fontFamily: "Afacad" }]}>{item.wijziging}</Text>
-                <View style={styles.innerItem}>
-                    <Text style={[styles.eersteTekst, { fontFamily: "Afacad" }]}>Naam:</Text>
-                    <Text style={[styles.tweedeTekst, { fontFamily: "Afacad" }]}>{item.apparaat}</Text>
-                </View>
-                <View style={styles.innerItem}>
-                    <Text style={[styles.eersteTekst, { fontFamily: "Afacad" }]}>Apparaat ID:</Text>
-                    <Text style={[styles.tweedeTekst, { fontFamily: "Afacad" }]}>{item.apparaatID}</Text>
-                </View>
-                <View style={styles.innerItem}>
-                    <Text style={[styles.eersteTekst, { fontFamily: "Afacad" }]}>Tijdstip:</Text>
-                    <Text style={[styles.tweedeTekst, { fontFamily: "Afacad" }]}>{item.tijdstip}</Text>
-                </View>
-            </View>
-        </View>
-    )}
-    ListEmptyComponent={
-        <View style={{ padding: 20 }}>
-            <Text style={{ textAlign: "center" }}>Geen wijzigingen gevonden.</Text>
-        </View>
-    }
-/>
-
-                        <View style={styles.scrollbarTrack}>
-                            <View style={[styles.scrollbarThumb, { top: scrollPosition }]} />
+                        )}
+                    {/* WIJZIGINGEN */}
+                    <TouchableOpacity
+                        style={[dataStyles.subTitleMenu, isWijzigingenOpen ? { borderTopLeftRadius: 10, borderTopRightRadius: 10, } : { borderRadius: 10 }]}
+                        onPress={() => setIsWijzigingenOpen(!isWijzigingenOpen)}
+                    >
+                        <Text style={dataStyles.uitklapMenuTitle}>Wijzigingen</Text>
+                        <View style={isWijzigingenOpen ? dataStyles.triangleDown : dataStyles.triangleUp} />
+                    </TouchableOpacity>
+                        {isWijzigingenOpen && (
+                        <View style={dataStyles.parentFlatlistContainer}>
+                            <FlatList
+                                data={wijzingen}
+                                style={dataStyles.binnenContainerFlatlist}
+                                onScroll={handleWijzigingenScroll}
+                                showsVerticalScrollIndicator={false}
+                                scrollEventThrottle={16}
+                                keyExtractor={(item) => item.wijzigingID.toString()}
+                                renderItem={({ item, index }) => (
+                                    <View style={dataStyles.binnenContainerParent}>
+                                        <View
+                                            style={[
+                                                dataStyles.binnenContainer,
+                                                index === wijzingen.length - 1 && { borderBottomWidth: 0, paddingBottom: 0 },
+                                            ]}
+                                        >
+                                            <Text style={[dataStyles.innerTitle, { fontFamily: "Afacad" }]}>{item.wijziging}</Text>
+                                            <View style={dataStyles.innerItem}>
+                                                <Text style={[dataStyles.eersteTekst, { fontFamily: "Afacad" }]}>Naam:</Text>
+                                                <Text style={[dataStyles.tweedeTekst, { fontFamily: "Afacad" }]}>{item.apparaat}</Text>
+                                            </View>
+                                            <View style={dataStyles.innerItem}>
+                                                <Text style={[dataStyles.eersteTekst, { fontFamily: "Afacad" }]}>Apparaat ID:</Text>
+                                                <Text style={[dataStyles.tweedeTekst, { fontFamily: "Afacad" }]}>{item.apparaatID}</Text>
+                                            </View>
+                                            <View style={dataStyles.innerItem}>
+                                                <Text style={[dataStyles.eersteTekst, { fontFamily: "Afacad" }]}>Tijdstip:</Text>
+                                                <Text style={[dataStyles.tweedeTekst, { fontFamily: "Afacad" }]}>{item.tijdstip}</Text>
+                                            </View>
+                                        </View>
+                                    </View>
+                                )}
+                                ListEmptyComponent={
+                                    <View style={{ padding: 20 }}>
+                                        <Text style={{ textAlign: "center" }}>Geen wijzigingen gevonden.</Text>
+                                    </View>
+                                }
+                            />
+                            <View style={dataStyles.scrollbarTrack}>
+                                <View style={[dataStyles.scrollbarThumb, { top: wijzigingenScrollPosition }]} />
+                            </View>
                         </View>
+                        )}
+                    {/* Bijzonderheden */}
+                    <TouchableOpacity
+                        style={[dataStyles.subTitleMenu, isBijzonderheidOpen ? { borderTopLeftRadius: 10, borderTopRightRadius: 10, } : { borderRadius: 10 }]}
+                        onPress={() => setIsBijzonderheidOpen(!isBijzonderheidOpen)}
+                    >
+                        <Text style={dataStyles.uitklapMenuTitle}>Bijzonderheden</Text>
+                        <View style={isBijzonderheidOpen ? dataStyles.triangleDown : dataStyles.triangleUp} />
+                    </TouchableOpacity>
+                        {isBijzonderheidOpen && (
+                        <View style={dataStyles.parentFlatlistContainer}>
+                            <FlatList
+                                data={bijzonderheden}
+                                style={dataStyles.binnenContainerFlatlist}
+                                onScroll={handleBijzonderhedenScroll}
+                                showsVerticalScrollIndicator={false}
+                                scrollEventThrottle={16}
+                                keyExtractor={(item) => item.bijzonderheidID.toString()}
+                                renderItem={({ item, index }) => (
+                                    <View style={dataStyles.binnenContainerParent}>
+                                        <View
+                                            style={[
+                                                dataStyles.binnenContainer,
+                                                index === bijzonderheden.length - 1 && { borderBottomWidth: 0, paddingBottom: 0 },
+                                            ]}
+                                        >
+                                            <Text style={[dataStyles.innerTitle, { fontFamily: "Afacad" }]}>{item.bijzonderheid}</Text>
+                                            <View style={dataStyles.innerItem}>
+                                                <Text style={[dataStyles.eersteTekst, { fontFamily: "Afacad" }]}>Naam:</Text>
+                                                <Text style={[dataStyles.tweedeTekst, { fontFamily: "Afacad" }]}>{item.apparaat}</Text>
+                                            </View>
+                                            <View style={dataStyles.innerItem}>
+                                                <Text style={[dataStyles.eersteTekst, { fontFamily: "Afacad" }]}>Apparaat ID:</Text>
+                                                <Text style={[dataStyles.tweedeTekst, { fontFamily: "Afacad" }]}>{item.apparaatID}</Text>
+                                            </View>
+                                            <View style={dataStyles.innerItem}>
+                                                <Text style={[dataStyles.eersteTekst, { fontFamily: "Afacad" }]}>Tijdstip:</Text>
+                                                <Text style={[dataStyles.tweedeTekst, { fontFamily: "Afacad" }]}>{item.tijdstip}</Text>
+                                            </View>
+                                        </View>
+                                    </View>
+                                )}
+                                ListEmptyComponent={
+                                    <View style={{ padding: 20 }}>
+                                        <Text style={{ textAlign: "center" }}>Geen wijzigingen gevonden.</Text>
+                                    </View>
+                                }
+                            />
+                            <View style={dataStyles.scrollbarTrack}>
+                                <View style={[dataStyles.scrollbarThumb, { top: bijzonderhedenScrollPosition }]} />
+                            </View>
+                        </View>
+                        )}                    
                     </View>
-                    )}
-                </View>
-            </View>
-            <ExpandableMenu />
-        </Background>
-        // </ProtectedRoute>
+                    {/* ===============OVERZICHT================ */}
+                    <View style={[homeStyles.infoSectionContainer, plantStyles.articlesParent, dataStyles.uitklapbaarMenu, { marginTop: 0 }]}>
+                        <Text style={[plantenStyles.title, { margin: 0 }]}>Data Overzicht</Text>
+                        {/* SENSORDATA */}
+                        <TouchableOpacity
+                            style={[dataStyles.subTitleMenu, isSensordataOpen ? { borderTopLeftRadius: 10, borderTopRightRadius: 10, } : { borderRadius: 10 }]}
+                            onPress={() => setIsSensordataOpen(!isSensordataOpen)}
+                        >
+                            <Text style={dataStyles.uitklapMenuTitle}>Sensordata</Text>
+                            <View style={isSensordataOpen ? dataStyles.triangleDown : dataStyles.triangleUp} />
+                        </TouchableOpacity>
+                        {isSensordataOpen && (
+                        <View style={dataStyles.parentFlatlistContainer}>
+                            <FlatList
+                                data={sensordata}
+                                style={dataStyles.binnenContainerFlatlist}
+                                showsVerticalScrollIndicator={false}
+                                onScroll={handleSensordataScroll}
+                                scrollEventThrottle={16}
+                                keyExtractor={(item) => item.sensordataID.toString()}
+                                renderItem={({ item, index }) => (
+                                    <View style={dataStyles.binnenContainerParent}>
+                                        <View
+                                            style={[
+                                                dataStyles.binnenContainer,
+                                                index === sensordata.length - 1 && { borderBottomWidth: 0, paddingBottom: 0 },
+                                            ]}
+                                        >
+                                            <Text style={[dataStyles.innerTitle, { fontFamily: "Afacad" }]}>{item.apparaat}</Text>
+                                            <View style={dataStyles.innerItem}>
+                                                <Text style={[dataStyles.eersteTekst, { fontFamily: "Afacad" }]}>Apparaat ID:</Text>
+                                                <Text style={[dataStyles.tweedeTekst, { fontFamily: "Afacad" }]}>{item.apparaatID}</Text>
+                                            </View>
+                                            <View style={dataStyles.innerItem}>
+                                                <Text style={[dataStyles.eersteTekst, { fontFamily: "Afacad" }]}>Tijdstip:</Text>
+                                                <Text style={[dataStyles.tweedeTekst, { fontFamily: "Afacad" }]}>{item.tijdstip}</Text>
+                                            </View>
+                                            <View style={dataStyles.innerItem}>
+                                                <Text style={[dataStyles.eersteTekst, { fontFamily: "Afacad" }]}>Waarde:</Text>
+                                                <Text style={[dataStyles.tweedeTekst, { fontFamily: "Afacad" }]}>{item.waarde}</Text>
+                                            </View>
+                                        </View>
+                                    </View>
+                                )}
+                                ListEmptyComponent={
+                                    <View style={{ padding: 20 }}>
+                                        <Text style={{ textAlign: "center" }}>Geen foutmeldingen gevonden.</Text>
+                                    </View>
+                                }
+                            />
+                            <View style={dataStyles.scrollbarTrack}>
+                                <View style={[dataStyles.scrollbarThumb, { top: sensordataScrollPosition }]} />
+                            </View>
+                        </View>
+                        )}
+                        {/* PLANTDATA */}
+                        <TouchableOpacity
+                            style={[dataStyles.subTitleMenu, isPlantdataOpen ? { borderTopLeftRadius: 10, borderTopRightRadius: 10, } : { borderRadius: 10 }]}
+                            onPress={() => setIsPlantdataOpen(!isPlantdataOpen)}
+                        >
+                            <Text style={dataStyles.uitklapMenuTitle}>Plantendata</Text>
+                            <View style={isPlantdataOpen ? dataStyles.triangleDown : dataStyles.triangleUp} />
+                        </TouchableOpacity>
+                        {isPlantdataOpen && (
+                        <View style={dataStyles.parentFlatlistContainer}>
+                            <FlatList
+                                data={plantdata}
+                                style={dataStyles.binnenContainerFlatlist}
+                                onScroll={handlePlantdataScroll}
+                                showsVerticalScrollIndicator={false}
+                                scrollEventThrottle={16}
+                                keyExtractor={(item) => item.plantdataID.toString()}
+                                renderItem={({ item, index }) => (
+                                    <View style={dataStyles.binnenContainerParent}>
+                                        <View
+                                            style={[
+                                                dataStyles.binnenContainer,
+                                                index === plantdata.length - 1 && { borderBottomWidth: 0, paddingBottom: 0 },
+                                            ]}
+                                        >
+                                            <Text style={[dataStyles.innerTitle, { fontFamily: "Afacad" }]}>{item.beschrijving}</Text>
+                                            <View style={dataStyles.innerItem}>
+                                                <Text style={[dataStyles.eersteTekst, { fontFamily: "Afacad" }]}>Naam:</Text>
+                                                <Text style={[dataStyles.tweedeTekst, { fontFamily: "Afacad" }]}>{item.plantnaam}</Text>
+                                            </View>
+                                            <View style={dataStyles.innerItem}>
+                                                <Text style={[dataStyles.eersteTekst, { fontFamily: "Afacad" }]}>Reden:</Text>
+                                                <Text style={[dataStyles.tweedeTekst, { fontFamily: "Afacad" }]}>{item.reden}</Text>
+                                            </View>
+                                            <View style={dataStyles.innerItem}>
+                                                <Text style={[dataStyles.eersteTekst, { fontFamily: "Afacad" }]}>Plant ID:</Text>
+                                                <Text style={[dataStyles.tweedeTekst, { fontFamily: "Afacad" }]}>{item.plantID}</Text>
+                                            </View>
+                                            <View style={dataStyles.innerItem}>
+                                                <Text style={[dataStyles.eersteTekst, { fontFamily: "Afacad" }]}>Tijdstip:</Text>
+                                                <Text style={[dataStyles.tweedeTekst, { fontFamily: "Afacad" }]}>{item.tijdstip}</Text>
+                                            </View>
+                                        </View>
+                                    </View>
+                                )}
+                                ListEmptyComponent={
+                                    <View style={{ padding: 20 }}>
+                                        <Text style={{ textAlign: "center" }}>Geen wijzigingen gevonden.</Text>
+                                    </View>
+                                }
+                            />
+                            <View style={dataStyles.scrollbarTrack}>
+                                <View style={[dataStyles.scrollbarThumb, { top: plantdataScrollPosition }]} />
+                            </View>
+                        </View>
+                        )}             
+                    </View>
+                </ScrollView>
+                <ExpandableMenu />
+            </Background>
+        </ProtectedRoute>
     );
 };
 
-const styles = StyleSheet.create({
-    uitklapbaarMenu:
-    { 
-        marginHorizontal: 10, 
-        marginBottom: 15, 
-        paddingTop: 10, 
-        paddingBottom: 25, 
-        gap: 0 
-    },
-    uitklapMenuTitle:
-    { 
-        fontSize: 20, 
-        color: "white", 
-        fontWeight: "bold", 
-        marginRight: 10 
-    },
-    containerTitle:
-    { 
-        borderBottomWidth: 3, 
-        borderColor: Colors.light.primary, 
-    },
-    parentFlatlistContainer:
-    {
-        flexDirection: "row", 
-        flex: 1, 
-        backgroundColor: "rgba(221, 245, 222, 0.5)"
-        // backgroundColor: "red",
-    },
-    binnenContainerParent:
-    {
-        paddingVertical: 5, 
-        paddingHorizontal: 15, 
-    },
-    binnenContainer:
-    { 
-        // backgroundColor: "rgba(221, 245, 222, 0.5)"
-        borderBottomWidth: 3, 
-        borderColor: Colors.light.primary, 
-        gap: 1, 
-        paddingBottom: 10
-    },
-    binnenContainerFlatlist:
-    { 
-        // backgroundColor: "white" 
-        maxHeight: 250,
-    },
-    innerTitle:
-    {
-        fontWeight: "bold",
-        fontSize: 20,
-        color: "#353535"
-    },
-    innerItem:
-    {
-        flexDirection: "row",
-        gap: 5,
-    },
-    eersteTekst:
-    {
-        fontSize: 20,
-        color: "darkgray",
-    },
-    tweedeTekst:
-    {
-        fontWeight: "bold",
-        fontSize: 20,
-        color: "#9C9C9C",
-    },
-    triangleUp: 
-    {
-        width: 0,
-        height: 0,
-        borderLeftWidth: 13,
-        borderRightWidth: 13,
-        borderBottomWidth: 20,
-        borderLeftColor: "transparent",
-        borderRightColor: "transparent",
-        borderBottomColor: Colors.light.text, 
-    },
-    triangleDown: 
-    {
-        width: 0,
-        height: 0,
-        borderLeftWidth: 13,
-        borderRightWidth: 13,
-        borderTopWidth: 20,
-        borderLeftColor: "transparent",
-        borderRightColor: "transparent",
-        borderTopColor: Colors.light.text,
-    },
-    subTitleMenu:
-    { 
-        flexDirection: "row", 
-        alignItems: "center", 
-        backgroundColor: "#ABD3AE", 
-        justifyContent: "space-between", 
-        paddingHorizontal: 10, 
-        paddingVertical: 5, 
-        borderTopLeftRadius: 10, 
-        borderTopRightRadius: 10, 
-        marginTop: 20 
-    },
-    scrollbarTrack: {
-        width: 12,
-        height: 250,
-        marginHorizontal: 15,
-        backgroundColor: "white",
-        borderRadius: 15,
-        position: "relative",
-        borderColor: Colors.light.primary,
-        borderWidth: 2,
-        margin: 10,
-    },
-    scrollbarThumb: {
-        width: 8,
-        height: 45,
-        backgroundColor: Colors.light.text,
-        borderRadius: 15,
-        position: "absolute",
-    },
-    
-    
-});
 
 export default Data;

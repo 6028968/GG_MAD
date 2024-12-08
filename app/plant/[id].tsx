@@ -1,14 +1,13 @@
 import React, { useEffect, useState } from "react";
-import { View, Text, StyleSheet, ActivityIndicator, Switch, TouchableOpacity } from "react-native";
+import { View, Text, ActivityIndicator, TouchableOpacity } from "react-native";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { homeStyles } from "@/constants/HomeStyles";
 import Background from "@/components/Background";
-import { Directions } from "react-native-gesture-handler";
 import ExpandableMenu from "@/components/MenuDownUnder";
 import { useFonts } from "expo-font";
 import { Plant } from "@/assets/types/plantTypes"
-import { styles } from "@/constants/PlantStyles"
+import { plantStyles } from "@/constants/PlantStyles"
 import { CustomSwitchProps } from "@/assets/types/customTypes";
 
 const capitalizeFirstLetter = (string: string): string => {
@@ -19,16 +18,16 @@ const CustomSwitch: React.FC<CustomSwitchProps> = ({ value, onValueChange }) => 
     return (
         <TouchableOpacity
             style={[
-                styles.switchContainer,
-                value ? styles.switchOn : styles.switchOff,
+                plantStyles.switchContainer,
+                value ? plantStyles.switchOn : plantStyles.switchOff,
             ]}
             onPress={() => onValueChange(!value)}
             activeOpacity={0.8}
         >
             <View
                 style={[
-                    styles.thumb,
-                    value ? styles.thumbOn : styles.thumbOff,
+                    plantStyles.thumb,
+                    value ? plantStyles.thumbOn : plantStyles.thumbOff,
                 ]}
             />
         </TouchableOpacity>
@@ -109,96 +108,96 @@ const PlantDetail: React.FC = () => {
 
     if (!plant) {
         return (
-            <View style={styles.container}>
-                <Text style={styles.errorText}>Plant niet gevonden.</Text>
+            <View style={plantStyles.container}>
+                <Text style={plantStyles.errorText}>Plant niet gevonden.</Text>
             </View>
         );
     }
 
     return (
         <Background>
-            <View style={styles.container}>
-                <View style={[homeStyles.infoSectionContainer, styles.articlesParent]}>
-                    <View style={styles.articleTitle}>
-                        <Text style={[styles.title, { fontFamily: "Akaya" }]}>{capitalizeFirstLetter(plant.naam)}</Text>
-                        <Text style={[styles.subtitle, { fontFamily: "Afacad" }]}>| {plant.soort}</Text>
+            <View style={plantStyles.container}>
+                <View style={[homeStyles.infoSectionContainer, plantStyles.articlesParent]}>
+                    <View style={plantStyles.articleTitle}>
+                        <Text style={[plantStyles.title, { fontFamily: "Akaya" }]}>{capitalizeFirstLetter(plant.naam)}</Text>
+                        <Text style={[plantStyles.subtitle, { fontFamily: "Afacad" }]}>| {plant.soort}</Text>
                     </View>
-                    <View style={styles.borderContainer}>
-                    <View style={styles.articleItems}>
-                        <Text style={[styles.teksten, { fontFamily: "Afacad" }]}>Aanwezig:</Text>
+                    <View style={plantStyles.borderContainer}>
+                    <View style={plantStyles.articleItems}>
+                        <Text style={[plantStyles.teksten, { fontFamily: "Afacad" }]}>Aanwezig:</Text>
                         {isAdmin ? (
                             <CustomSwitch value={plant.aanwezig} onValueChange={toggleAanwezig} />
                         ) : (
-                            <Text style={[styles.teksten, styles.tweedeItem, { fontFamily: "Afacad" }]}>
+                            <Text style={[plantStyles.teksten, plantStyles.tweedeItem, { fontFamily: "Afacad" }]}>
                                 {plant.aanwezig ? "Ja" : "Nee"}
                             </Text>
                         )}
                         </View>
-                        <View style={styles.articleItems}>
-                            <Text style={[styles.teksten, { fontFamily: "Afacad" }]}>Dagen in Kas:</Text>
-                            <Text style={[styles.teksten, styles.tweedeItem, { fontFamily: "Afacad" }]}>{plant.dagenInKas}</Text>
+                        <View style={plantStyles.articleItems}>
+                            <Text style={[plantStyles.teksten, { fontFamily: "Afacad" }]}>Dagen in Kas:</Text>
+                            <Text style={[plantStyles.teksten, plantStyles.tweedeItem, { fontFamily: "Afacad" }]}>{plant.dagenInKas}</Text>
                         </View>
                     </View>
-                    <View style={styles.paddingView}>
-                        <View style={styles.articleItems}>
-                            <Text style={[styles.teksten, { fontFamily: "Afacad" }]}>Totaal Geplant:</Text>
-                            <Text style={[styles.teksten, styles.tweedeItem, { fontFamily: "Afacad" }]}>{plant.totaalGeplant}</Text>
+                    <View style={plantStyles.paddingView}>
+                        <View style={plantStyles.articleItems}>
+                            <Text style={[plantStyles.teksten, { fontFamily: "Afacad" }]}>Totaal Geplant:</Text>
+                            <Text style={[plantStyles.teksten, plantStyles.tweedeItem, { fontFamily: "Afacad" }]}>{plant.totaalGeplant}</Text>
                         </View>
-                        <View style={styles.articleItems}>
-                            <Text style={[styles.teksten, { fontFamily: "Afacad" }]}>Mislukte Oogst:</Text>
-                            <Text style={[styles.teksten, styles.tweedeItem, { fontFamily: "Afacad" }]}>{plant.mislukteOogst}</Text>
+                        <View style={plantStyles.articleItems}>
+                            <Text style={[plantStyles.teksten, { fontFamily: "Afacad" }]}>Mislukte Oogst:</Text>
+                            <Text style={[plantStyles.teksten, plantStyles.tweedeItem, { fontFamily: "Afacad" }]}>{plant.mislukteOogst}</Text>
                         </View>
-                        <View style={styles.articleItems}>
-                            <Text style={[styles.teksten, { fontFamily: "Afacad" }]}>Succesvolle Oogst:</Text>
-                            <Text style={[styles.teksten, styles.tweedeItem, { fontFamily: "Afacad" }]}>{plant.succesvolleOogst}</Text>
+                        <View style={plantStyles.articleItems}>
+                            <Text style={[plantStyles.teksten, { fontFamily: "Afacad" }]}>Succesvolle Oogst:</Text>
+                            <Text style={[plantStyles.teksten, plantStyles.tweedeItem, { fontFamily: "Afacad" }]}>{plant.succesvolleOogst}</Text>
                         </View>
                     </View>
                 </View>
-                <View style={[homeStyles.infoSectionContainer, styles.articlesParent]}>
-                    <View style={styles.borderContainer}>
-                        <View style={styles.articleItems}>
-                            <Text style={[styles.teksten, { fontFamily: "Afacad" }]}>Naam:</Text>
-                            <Text style={[styles.teksten, styles.tweedeItem, { fontFamily: "Afacad" }]}>{capitalizeFirstLetter(plant.naam)}</Text>
+                <View style={[homeStyles.infoSectionContainer, plantStyles.articlesParent]}>
+                    <View style={plantStyles.borderContainer}>
+                        <View style={plantStyles.articleItems}>
+                            <Text style={[plantStyles.teksten, { fontFamily: "Afacad" }]}>Naam:</Text>
+                            <Text style={[plantStyles.teksten, plantStyles.tweedeItem, { fontFamily: "Afacad" }]}>{capitalizeFirstLetter(plant.naam)}</Text>
                         </View>
-                        <View style={styles.articleItems}>
-                            <Text style={[styles.teksten, { fontFamily: "Afacad" }]}>Wetenschappelijke Naam:</Text>
-                            <Text style={[styles.teksten, styles.tweedeItem, { fontFamily: "Afacad" }]}>{plant.wetenschappelijkeNaam}</Text>
-                        </View>
-                    </View>
-                    <View style={styles.borderContainer}>
-                        <View style={styles.articleItems}>
-                            <Text style={[styles.teksten, { fontFamily: "Afacad" }]}>Zonlicht:</Text>
-                            <Text style={[styles.teksten, styles.tweedeItem, { fontFamily: "Afacad" }]}>{plant.zonlicht}</Text>
-                        </View>
-                        <View style={styles.articleItems}>
-                            <Text style={[styles.teksten, { fontFamily: "Afacad" }]}>Irrigatie Frequentie:</Text>
-                            <Text style={[styles.teksten, styles.tweedeItem, { fontFamily: "Afacad" }]}>{plant.irrigatieFrequentie}</Text>
-                        </View>
-                        <View style={styles.articleItems}>
-                            <Text style={[styles.teksten, { fontFamily: "Afacad" }]}>Laatste Irrigratie:</Text>
-                            <Text style={[styles.teksten, styles.tweedeItem, { fontFamily: "Afacad" }]}>{plant.laatsteIrrigratie}</Text>
-                        </View>
-                        <View style={styles.articleItems}>
-                            <Text style={[styles.teksten, { fontFamily: "Afacad" }]}>Aankomende Irrigratie:</Text>
-                            <Text style={[styles.teksten, styles.tweedeItem, { fontFamily: "Afacad" }]}>{plant.aankomendeIrrigratie}</Text>
-                        </View>
-                        <View style={styles.articleItems}>
-                            <Text style={[styles.teksten, { fontFamily: "Afacad" }]}>Laatste Bemesting:</Text>
-                            <Text style={[styles.teksten, styles.tweedeItem, { fontFamily: "Afacad" }]}>{plant.laatsteBemesting}</Text>
-                        </View>
-                        <View style={styles.articleItems}>
-                            <Text style={[styles.teksten, { fontFamily: "Afacad" }]}>Aankomende Bemesting:</Text>
-                            <Text style={[styles.teksten, styles.tweedeItem, { fontFamily: "Afacad" }]}>{plant.aankomendeBemesting}</Text>
+                        <View style={plantStyles.articleItems}>
+                            <Text style={[plantStyles.teksten, { fontFamily: "Afacad" }]}>Wetenschappelijke Naam:</Text>
+                            <Text style={[plantStyles.teksten, plantStyles.tweedeItem, { fontFamily: "Afacad" }]}>{plant.wetenschappelijkeNaam}</Text>
                         </View>
                     </View>
-                    <View style={styles.paddingView}>
-                        <View style={styles.articleItems}>
-                            <Text style={[styles.teksten, { fontFamily: "Afacad" }]}>Meest Succesvolle Maand:</Text>
-                            <Text style={[styles.teksten, styles.tweedeItem, { fontFamily: "Afacad" }]}>{plant.meestSuccesvolleMaand}</Text>
+                    <View style={plantStyles.borderContainer}>
+                        <View style={plantStyles.articleItems}>
+                            <Text style={[plantStyles.teksten, { fontFamily: "Afacad" }]}>Zonlicht:</Text>
+                            <Text style={[plantStyles.teksten, plantStyles.tweedeItem, { fontFamily: "Afacad" }]}>{plant.zonlicht}</Text>
                         </View>
-                        <View style={styles.articleItems}>
-                            <Text style={[styles.teksten, { fontFamily: "Afacad" }]}>Meest Succesvolle Seizoen:</Text>
-                            <Text style={[styles.teksten, styles.tweedeItem, { fontFamily: "Afacad" }]}>{plant.meestSuccesvolleSeizoen}</Text>
+                        <View style={plantStyles.articleItems}>
+                            <Text style={[plantStyles.teksten, { fontFamily: "Afacad" }]}>Irrigatie Frequentie:</Text>
+                            <Text style={[plantStyles.teksten, plantStyles.tweedeItem, { fontFamily: "Afacad" }]}>{plant.irrigatieFrequentie}</Text>
+                        </View>
+                        <View style={plantStyles.articleItems}>
+                            <Text style={[plantStyles.teksten, { fontFamily: "Afacad" }]}>Laatste Irrigratie:</Text>
+                            <Text style={[plantStyles.teksten, plantStyles.tweedeItem, { fontFamily: "Afacad" }]}>{plant.laatsteIrrigratie}</Text>
+                        </View>
+                        <View style={plantStyles.articleItems}>
+                            <Text style={[plantStyles.teksten, { fontFamily: "Afacad" }]}>Aankomende Irrigratie:</Text>
+                            <Text style={[plantStyles.teksten, plantStyles.tweedeItem, { fontFamily: "Afacad" }]}>{plant.aankomendeIrrigratie}</Text>
+                        </View>
+                        <View style={plantStyles.articleItems}>
+                            <Text style={[plantStyles.teksten, { fontFamily: "Afacad" }]}>Laatste Bemesting:</Text>
+                            <Text style={[plantStyles.teksten, plantStyles.tweedeItem, { fontFamily: "Afacad" }]}>{plant.laatsteBemesting}</Text>
+                        </View>
+                        <View style={plantStyles.articleItems}>
+                            <Text style={[plantStyles.teksten, { fontFamily: "Afacad" }]}>Aankomende Bemesting:</Text>
+                            <Text style={[plantStyles.teksten, plantStyles.tweedeItem, { fontFamily: "Afacad" }]}>{plant.aankomendeBemesting}</Text>
+                        </View>
+                    </View>
+                    <View style={plantStyles.paddingView}>
+                        <View style={plantStyles.articleItems}>
+                            <Text style={[plantStyles.teksten, { fontFamily: "Afacad" }]}>Meest Succesvolle Maand:</Text>
+                            <Text style={[plantStyles.teksten, plantStyles.tweedeItem, { fontFamily: "Afacad" }]}>{plant.meestSuccesvolleMaand}</Text>
+                        </View>
+                        <View style={plantStyles.articleItems}>
+                            <Text style={[plantStyles.teksten, { fontFamily: "Afacad" }]}>Meest Succesvolle Seizoen:</Text>
+                            <Text style={[plantStyles.teksten, plantStyles.tweedeItem, { fontFamily: "Afacad" }]}>{plant.meestSuccesvolleSeizoen}</Text>
                         </View>
                     </View>
                 </View>

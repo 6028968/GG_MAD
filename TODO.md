@@ -35,6 +35,10 @@
 
 ## --- Logboek ---
 
+- [x] Data meer uniek maken
+
 ### Notes
 
 - Alles controleren of het op mobiel ook geod eruit ziet en werkt!
+
+- Overal "ProtectedRoute" neerzetten
