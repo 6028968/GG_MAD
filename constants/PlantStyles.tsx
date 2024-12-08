@@ -92,5 +92,5 @@ export const plantStyles = StyleSheet.create({
     {
         fontSize: 20,
         color: "darkgray",
-    },
+    }
 });

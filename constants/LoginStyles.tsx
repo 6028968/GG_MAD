@@ -13,6 +13,11 @@ export const LoginStyles = StyleSheet.create({
         alignItems: 'center',
         alignSelf: "center",
         width: "90%",
+        shadowColor: "black",
+        shadowOffset: { width: 1, height: 8 },
+        shadowOpacity: 0.2,
+        shadowRadius: 10, 
+        elevation: 10, 
     },
     formContainer: 
     {

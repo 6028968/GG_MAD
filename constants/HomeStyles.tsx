@@ -40,8 +40,8 @@ export const homeStyles = StyleSheet.create({
     {
         width: 50,
         height: 50,
-        marginTop: -15,
-        // marginBottom: 5,
+        marginTop: 0,
+        marginBottom: 5,
     },
     text: 
     {
@@ -241,7 +241,7 @@ export const homeStyles = StyleSheet.create({
     {
         width: "100%",
         // justifyContent: "center",
-        height: 50,
+        height: 40,
         borderColor: Colors.light.primary,
         borderWidth: 2,
         borderRadius: 25,

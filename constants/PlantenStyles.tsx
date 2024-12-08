@@ -107,4 +107,49 @@ export const plantenStyles = StyleSheet.create({
         borderRadius: 10,
         position: "absolute",
     },
+    activeButton:
+    {
+        backgroundColor: "transparent"
+    },
+    buttonText:
+    {
+        color: "green",
+        fontWeight: "bold",
+    }, 
+    activeBullet: {
+        borderColor: "rgba(46, 86, 81, 1)",
+    },
+    
+    bulletButton: {
+        flexDirection: "row",
+        alignItems: "center",
+        marginVertical: 5,
+    },
+    
+    bulletCircle: {
+        width: 20,
+        height: 20,
+        borderRadius: 15,
+        borderWidth: 2,
+        borderColor: "rgba(46, 86, 81, 1)",
+        backgroundColor: "white", 
+        justifyContent: "center",
+        alignItems: "center",
+        marginRight: 10,
+    },
+    
+    activeCircle: {
+        width: 12,
+        height: 12,
+        borderRadius: 10,
+        backgroundColor: "rgba(46, 86, 81, 1)", // Groene knop binnenin
+    },
+    
+    
+    bulletText: {
+        fontSize: 16,
+        color: Colors.light.gray,
+        fontWeight: "bold"
+    },
+    
 });

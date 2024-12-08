@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { View, Text, TextInput, TouchableOpacity, Alert } from "react-native";
+import { View, Text, TextInput, TouchableOpacity, Modal } from "react-native";
 import { GlobalStyles } from "@/constants/GlobalStyles";
 import { LoginStyles } from "@/constants/LoginStyles";
 import { useRouter } from "expo-router";
@@ -7,6 +7,7 @@ import { useFonts } from "expo-font";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import bcrypt from "bcryptjs";
 import { User, ValidationErrors } from "@/assets/interfaces/customInterfaces";
+import { homeStyles } from "@/constants/HomeStyles";
 
 export default function RegisterScreen() {
     const [username, setUsername] = useState("");
@@ -14,6 +15,7 @@ export default function RegisterScreen() {
     const [password, setPassword] = useState("");
     const [confirmPassword, setConfirmPassword] = useState("");
     const [errors, setErrors] = useState<ValidationErrors>({});
+    const [isModalVisible, setModalVisible] = useState(false);
     const router = useRouter();
 
     const [isUsernameFocused, setIsUsernameFocused] = useState(false);
@@ -32,12 +34,21 @@ export default function RegisterScreen() {
         if (!username.trim()) {
             validationErrors.username = "Gebruikersnaam is verplicht.";
         }
+    
         if (!email.trim()) {
             validationErrors.email = "E-mailadres is verplicht.";
+        } 
+        else {
+            const emailRegex = /^[^\s@]+@[^\s@]+\.(nl|com)$/;
+            if (!emailRegex.test(email)) {
+                validationErrors.email = "Voer een geldig e-mailadres in.";
+            }
         }
+    
         if (!password.trim()) {
             validationErrors.password = "Wachtwoord is verplicht.";
         }
+    
         if (!confirmPassword.trim()) {
             validationErrors.confirmPassword = "Herhaal wachtwoord is verplicht.";
         }
@@ -72,28 +83,24 @@ export default function RegisterScreen() {
     
         const formatDate = (date: Date): string => {
             const day = String(date.getDate()).padStart(2, "0");
-            const month = String(date.getMonth() + 1).padStart(2, "0"); 
+            const month = String(date.getMonth() + 1).padStart(2, "0");
             const year = date.getFullYear();
             return `${day}-${month}-${year}`;
         };
-        
+    
         const newUser: User = {
             username,
             email,
             password: hashedPassword,
             role: "gebruiker",
-            aangemaakt: formatDate(new Date()), 
+            aangemaakt: formatDate(new Date()),
         };
-        
     
         users.push(newUser);
         await AsyncStorage.setItem("users", JSON.stringify(users));
     
-        Alert.alert("Succes", "Registratie voltooid. U kunt nu inloggen.", [
-            { text: "OK", onPress: () => router.push("/") },
-        ]);
-    };
-    
+        setModalVisible(true);
+    };    
 
     if (!fontsLoaded) {
         return null;
@@ -122,9 +129,6 @@ export default function RegisterScreen() {
                             onBlur={() => setIsUsernameFocused(false)}
                             selectionColor="rgb(46, 86, 81)"
                         />
-                        {errors.username && (
-                            <Text style={LoginStyles.error}>{errors.username}</Text>
-                        )}
 
                         <TextInput
                             style={[
@@ -140,9 +144,6 @@ export default function RegisterScreen() {
                             onBlur={() => setIsEmailFocused(false)}
                             selectionColor="rgb(46, 86, 81)"
                         />
-                        {errors.email && (
-                            <Text style={LoginStyles.error}>{errors.email}</Text>
-                        )}
 
                         <TextInput
                             style={[
@@ -159,9 +160,6 @@ export default function RegisterScreen() {
                             onBlur={() => setIsPasswordFocused(false)}
                             selectionColor="rgb(46, 86, 81)"
                         />
-                        {errors.password && (
-                            <Text style={LoginStyles.error}>{errors.password}</Text>
-                        )}
 
                         <TextInput
                             style={[
@@ -178,6 +176,15 @@ export default function RegisterScreen() {
                             onBlur={() => setIsConfirmPasswordFocused(false)}
                             selectionColor="rgb(46, 86, 81)"
                         />
+                        {errors.username && (
+                            <Text style={LoginStyles.error}>{errors.username}</Text>
+                        )}
+                        {errors.email && (
+                            <Text style={LoginStyles.error}>{errors.email}</Text>
+                        )}
+                        {errors.password && (
+                            <Text style={LoginStyles.error}>{errors.password}</Text>
+                        )}
                         {errors.confirmPassword && (
                             <Text style={LoginStyles.error}>{errors.confirmPassword}</Text>
                         )}
@@ -190,7 +197,6 @@ export default function RegisterScreen() {
                                 Registreren
                             </Text>
                         </TouchableOpacity>
-
                         <TouchableOpacity
                             style={LoginStyles.registerButton}
                             onPress={() => router.push("/")}
@@ -202,6 +208,35 @@ export default function RegisterScreen() {
                     </View>
                 </View>
             </View>
+
+            {/* Modal */}
+            <Modal
+                animationType="slide"
+                transparent={true}
+                visible={isModalVisible}
+                onRequestClose={() => setModalVisible(false)}
+            >
+                <View style={homeStyles.modalOverlay}>
+                    <View style={homeStyles.outerModalContainer}>
+                        <View style={homeStyles.modalContainer}>
+                            <Text style={homeStyles.modalTitle}>
+                                Registratie voltooid!
+                            </Text>
+                            <TouchableOpacity
+                                style={[homeStyles.button, homeStyles.addButton, { flex: 1, alignSelf: "center", paddingHorizontal: 20  }]}
+                                onPress={() => {
+                                    setModalVisible(false);
+                                    router.push("/");
+                                }}
+                            >
+                                <Text style={{ fontFamily: "Akaya", color: "white", fontSize: 20 }}>
+                                    Inloggen
+                                </Text>
+                            </TouchableOpacity>
+                        </View>
+                    </View>
+                </View>
+            </Modal>
         </View>
     );
 }

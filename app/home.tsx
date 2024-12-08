@@ -8,10 +8,10 @@ import ExpandableMenu from "../components/MenuDownUnder";
 import { MaterialCommunityIcons } from "@expo/vector-icons"; 
 import { useFonts } from 'expo-font';
 import { homeStyles } from "@/constants/HomeStyles"
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Plant } from "@/assets/types/plantTypes";
 import DropDownPicker from "react-native-dropdown-picker";
 import AdminOnly from "@/components/AdminOnly";
+import { loadPlants, addPlant } from "@/components/PlantAsyncStorage";
 
 const capitalizeFirstLetter = (string: string): string => {
     return string.charAt(0).toUpperCase() + string.slice(1).toLowerCase();
@@ -81,90 +81,63 @@ const InfoSection: React.FC<{ toggle: string }> = ({ toggle }) => {
     };
 
     useEffect(() => {
-        const loadPlants = async () => {
-            try 
-            {
-                const savedPlants = await AsyncStorage.getItem("plants");
-                const parsedPlants: Plant[] = savedPlants ? JSON.parse(savedPlants) : [];
+        const fetchPlants = async () => {
+            const plants = await loadPlants();
+            const filteredPlants = plants.filter((plant) => plant.aanwezig);
     
-                const filteredPlants = parsedPlants.filter((plant) => plant.aanwezig);
-
-                const leftSide = filteredPlants.filter((plant) => plant.kant === "links");
-                const rightSide = filteredPlants.filter((plant) => plant.kant === "rechts");
+            const leftSide = filteredPlants.filter((plant) => plant.kant === "links");
+            const rightSide = filteredPlants.filter((plant) => plant.kant === "rechts");
     
-                setLeftItems(leftSide);
-                setRightItems(rightSide);
-            } 
-            catch (error) 
-            {
-                console.error("Failed to load plants:", error);
-            }
+            setLeftItems(leftSide);
+            setRightItems(rightSide);
         };
     
-        loadPlants();
+        fetchPlants();
     }, []);
 
     const handleSaveItem = async () => {
         if (newItemName.trim() !== "" && newItemSoort.trim() !== "") 
         {
-            try 
+            const newPlant: Plant = {
+                id: Date.now(), 
+                naam: newItemName,
+                soort: newItemSoort, 
+                aanwezig: true,
+                wetenschappelijkeNaam: "Lycopersicon esculentum",
+                dagenInKas: 0,
+                totaalGeplant: 0,
+                mislukteOogst: 0,
+                succesvolleOogst: 0,
+                zonlicht: "Onbekend",
+                irrigatieFrequentie: "Onbekend",
+                laatsteIrrigratie: "n.v.t.",
+                aankomendeIrrigratie: "n.v.t.",
+                laatsteBemesting: "n.v.t.",
+                aankomendeBemesting: "n.v.t.",
+                meestSuccesvolleMaand: "n.v.t.",
+                meestSuccesvolleSeizoen: "n.v.t.",
+                kant: toggle.toLowerCase() as "links" | "rechts",
+            };
+    
+            const updatedPlants = await addPlant(newPlant);
+            if (newPlant.kant === "links") 
             {
-                const savedPlants = await AsyncStorage.getItem("plants");
-                const existingPlants: Plant[] = savedPlants ? JSON.parse(savedPlants) : [];
-    
-                const nextId = existingPlants.length > 0
-                    ? Math.max(...existingPlants.map((plant) => plant.id)) + 1
-                    : 1;
-    
-                const newPlant: Plant = {
-                    id: nextId,
-                    naam: newItemName,
-                    soort: newItemSoort, 
-                    aanwezig: true,
-                    wetenschappelijkeNaam: "Lycopersicon esculentum",
-                    dagenInKas: 0,
-                    totaalGeplant: 0,
-                    mislukteOogst: 0,
-                    succesvolleOogst: 0,
-                    zonlicht: "Onbekend",
-                    irrigatieFrequentie: "Onbekend",
-                    laatsteIrrigratie: "n.v.t.",
-                    aankomendeIrrigratie: "n.v.t.",
-                    laatsteBemesting: "n.v.t.",
-                    aankomendeBemesting: "n.v.t.",
-                    meestSuccesvolleMaand: "n.v.t.",
-                    meestSuccesvolleSeizoen: "n.v.t.",
-                    kant: toggle.toLowerCase() as "links" | "rechts",
-                };
-    
-                const updatedPlants = [...existingPlants, newPlant];
-                await AsyncStorage.setItem("plants", JSON.stringify(updatedPlants));
-    
-                if (newPlant.kant === "links") 
-                {
-                    setLeftItems((prev) => [...prev, newPlant]);
-                } 
-                else if (newPlant.kant === "rechts") 
-                {
-                    setRightItems((prev) => [...prev, newPlant]);
-                }
-    
-                setNewItemName("");
-                setNewItemSoort("");
-                setModalVisible(false);
+                setLeftItems((prev) => [...prev, newPlant]);
             } 
-            catch (error) 
+            else if (newPlant.kant === "rechts") 
             {
-                console.error("Error bij het opslaan van de plant:", error);
-                Alert.alert("Fout", "Er ging iets mis bij het opslaan. Probeer opnieuw.");
+                setRightItems((prev) => [...prev, newPlant]);
             }
+    
+            setNewItemName("");
+            setNewItemSoort("");
+            setModalVisible(false);
         } 
         else 
         {
             Alert.alert("Fout", "Voer een geldige naam en soort in.");
         }
     };
-    
 
     const getCurrentItems = (): (Plant | "add" | null)[] => {
         const items = toggle === "Links" ? leftItems : rightItems;
@@ -211,92 +184,92 @@ const InfoSection: React.FC<{ toggle: string }> = ({ toggle }) => {
                 <View key={`placeholder-${index}`} style={homeStyles.dottedItem} />
                 )
             )}
-                </View>
-                <Modal
-                    animationType="slide"
-                    transparent={true}
-                    visible={isModalVisible}
-                    onRequestClose={() => setModalVisible(false)}
-                >
-                    <View style={homeStyles.modalOverlay}>
-                        <View style={homeStyles.outerModalContainer}>
-                            <View style={homeStyles.modalContainer}>
-                                <Text style={homeStyles.modalTitle}>Vul een plant in</Text>
-                                <View>
-                                    <Text style={homeStyles.inputText}>Plant Naam:</Text>
-                                    <TextInput
-                                        style={homeStyles.input}
-                                        value={newItemName}
-                                        onChangeText={setNewItemName}
-                                        placeholder=""
-                                        selectionColor="rgb(46, 86, 81)"
-                                    />
-                                </View>
-                                <View
-                                    style={{
-                                        zIndex: 1000, 
-                                        elevation: 1000, // Voor Android
-                                        position: "relative",
+            </View>
+            <Modal
+                animationType="slide"
+                transparent={true}
+                visible={isModalVisible}
+                onRequestClose={() => setModalVisible(false)}
+            >
+                <View style={homeStyles.modalOverlay}>
+                    <View style={homeStyles.outerModalContainer}>
+                        <View style={homeStyles.modalContainer}>
+                            <Text style={homeStyles.modalTitle}>Vul een plant in</Text>
+                            <View>
+                                <Text style={homeStyles.inputText}>Plant Naam:</Text>
+                                <TextInput
+                                    style={homeStyles.input}
+                                    value={newItemName}
+                                    onChangeText={setNewItemName}
+                                    placeholder=""
+                                    selectionColor="rgb(46, 86, 81)"
+                                />
+                            </View>
+                            <View
+                                style={{
+                                    zIndex: 1000, 
+                                    elevation: 1000, // Voor Android
+                                    position: "relative",
+                                }}
+                            >
+                                <Text style={homeStyles.inputText}>Plant Soort:</Text>
+                                <DropDownPicker
+                                    open={dropdownOpen}
+                                    setOpen={setDropdownOpen}
+                                    value={newItemSoort}
+                                    setValue={setNewItemSoort}
+                                    items={[
+                                        { label: "Fruit", value: "Fruit" },
+                                        { label: "Groente", value: "Groente" },
+                                        { label: "Kruiden", value: "Kruiden" },
+                                        { label: "Schimmel", value: "Schimmel" },
+                                        { label: "Overig", value: "Overig" },
+                                    ]}
+                                    placeholder="Selecteer een soort"
+                                    style={[homeStyles.input,  { height: 10, borderBottomWidth: 2, borderWidth: 0, marginBottom: 10, borderRadius: 0 }]}
+                                    dropDownContainerStyle={{
+                                        zIndex: 2000, 
+                                        elevation: 2000,
+                                        position: "absolute",
                                     }}
+                                    textStyle={{
+                                        textAlign: "center", 
+                                        fontSize: 16, 
+                                    }}
+                                    placeholderStyle={{
+                                        textAlign: "center", 
+                                    }}
+                                    listItemLabelStyle={{
+                                        textAlign: "center", 
+                                    }}
+                                    selectedItemLabelStyle={{
+                                        fontWeight: "bold", 
+                                        textAlign: "center", 
+                                    }}
+                                />
+                            </View>
+                            <View style={homeStyles.buttonContainer}>
+                                <TouchableOpacity
+                                    style={[homeStyles.button, homeStyles.addButton]}
+                                    onPress={handleSaveItem}
                                 >
-                                    <Text style={homeStyles.inputText}>Plant Soort:</Text>
-                                    <DropDownPicker
-                                        open={dropdownOpen}
-                                        setOpen={setDropdownOpen}
-                                        value={newItemSoort}
-                                        setValue={setNewItemSoort}
-                                        items={[
-                                            { label: "Fruit", value: "Fruit" },
-                                            { label: "Groente", value: "Groente" },
-                                            { label: "Kruiden", value: "Kruiden" },
-                                            { label: "Schimmel", value: "Schimmel" },
-                                            { label: "Overig", value: "Overig" },
-                                        ]}
-                                        placeholder="Selecteer een soort"
-                                        style={homeStyles.input}
-                                        dropDownContainerStyle={{
-                                            zIndex: 2000, 
-                                            elevation: 2000,
-                                            position: "absolute",
-                                        }}
-                                        textStyle={{
-                                            textAlign: "center", 
-                                            fontSize: 16, 
-                                        }}
-                                        placeholderStyle={{
-                                            textAlign: "center", 
-                                        }}
-                                        listItemLabelStyle={{
-                                            textAlign: "center", 
-                                        }}
-                                        selectedItemLabelStyle={{
-                                            fontWeight: "bold", 
-                                            textAlign: "center", 
-                                        }}
-                                    />
-                                </View>
-                                <View style={homeStyles.buttonContainer}>
-                                    <TouchableOpacity
-                                        style={[homeStyles.button, homeStyles.addButton]}
-                                        onPress={handleSaveItem}
-                                    >
-                                        <Text style={{ fontFamily: "Akaya", color: "white", fontSize: 20 }}>
-                                            Toevoegen
-                                        </Text>
-                                    </TouchableOpacity>
-                                    <TouchableOpacity
-                                        style={[homeStyles.button, homeStyles.cancelButton]}
-                                        onPress={() => setModalVisible(false)}
-                                    >
-                                        <Text style={{ fontFamily: "Akaya", color: "white", fontSize: 20 }}>
-                                            Annuleren
-                                        </Text>
-                                    </TouchableOpacity>
-                                </View>
+                                    <Text style={{ fontFamily: "Akaya", color: "white", fontSize: 20 }}>
+                                        Toevoegen
+                                    </Text>
+                                </TouchableOpacity>
+                                <TouchableOpacity
+                                    style={[homeStyles.button, homeStyles.cancelButton]}
+                                    onPress={() => setModalVisible(false)}
+                                >
+                                    <Text style={{ fontFamily: "Akaya", color: "white", fontSize: 20 }}>
+                                        Annuleren
+                                    </Text>
+                                </TouchableOpacity>
                             </View>
                         </View>
                     </View>
-                </Modal>
+                </View>
+            </Modal>
         </View>
     );
 };

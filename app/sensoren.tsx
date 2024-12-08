@@ -8,6 +8,7 @@ import { useFonts } from "expo-font";
 import { plantStyles } from "@/constants/PlantStyles";
 import { Sensor } from "@/assets/interfaces/customInterfaces";
 import { sensorStyles } from "@/constants/SensorStyles";
+import ProtectedRoute from "@/components/ProtectedRoute";
 
 const sensorIcon = require("@/assets/images/icons/sensor.png");
 
@@ -107,79 +108,81 @@ const Sensoren: React.FC = () => {
         };
 
     return (
-        <Background>
-            <View style={sensorStyles.mainContainer}>
-                <FlatList
-                    data={sensoren}
-                    style={sensorStyles.flatList}
-                    keyExtractor={(item) => item.sensorID.toString()}
-                    renderItem={({ item, index }) => (
-                    <View
-                        style={[
-                            homeStyles.infoSectionContainer,
-                            plantStyles.articlesParent,
-                            { marginHorizontal: 10, marginBottom: 15, paddingTop: 10, paddingBottom: 0 },
-                        ]}
-                    >
+        <ProtectedRoute>
+            <Background>
+                <View style={sensorStyles.mainContainer}>
+                    <FlatList
+                        data={sensoren}
+                        style={sensorStyles.flatList}
+                        keyExtractor={(item) => item.sensorID.toString()}
+                        renderItem={({ item, index }) => (
                         <View
                             style={[
-                                sensorStyles.titleView,
-                                { flexDirection: index % 2 === 0 ? "row-reverse" : "row" },
+                                homeStyles.infoSectionContainer,
+                                plantStyles.articlesParent,
+                                { marginHorizontal: 10, marginBottom: 15, paddingTop: 10, paddingBottom: 0 },
                             ]}
                         >
-                            <Image source={sensorIcon} style={sensorStyles.sensorIcon} />
-                            <Text style={sensorStyles.title}>Sensor {item.sensorID}</Text>
+                            <View
+                                style={[
+                                    sensorStyles.titleView,
+                                    { flexDirection: index % 2 === 0 ? "row-reverse" : "row" },
+                                ]}
+                            >
+                                <Image source={sensorIcon} style={sensorStyles.sensorIcon} />
+                                <Text style={sensorStyles.title}>Sensor {item.sensorID}</Text>
+                            </View>
+                            <View style={[plantStyles.articlesParent, { gap: 10, paddingHorizontal: 5, paddingTop: 5 }]}>
+                                <View style={plantStyles.articleItems}>
+                                    <Text style={[plantStyles.teksten, { fontFamily: "Afacad" }]}>Actief:</Text>
+                                    <Text style={[plantStyles.teksten, plantStyles.tweedeItem, { fontFamily: "Afacad" }]}>
+                                        {item.actief ? "Ja" : "Nee"}
+                                    </Text>
+                                </View>
+                                <View style={plantStyles.articleItems}>
+                                    <Text style={[plantStyles.teksten, { fontFamily: "Afacad" }]}>Sensor ID:</Text>
+                                    <Text style={[plantStyles.teksten, plantStyles.tweedeItem, { fontFamily: "Afacad" }]}>
+                                        {item.sensorID}
+                                    </Text>
+                                </View>
+                                <View style={plantStyles.articleItems}>
+                                    <Text style={[plantStyles.teksten, { fontFamily: "Afacad" }]}>Foutmelding:</Text>
+                                    <Text style={[plantStyles.teksten, plantStyles.tweedeItem, { fontFamily: "Afacad" }]}>
+                                        {item.foutmelding == null ? "n.v.t." : item.foutmelding}
+                                    </Text>
+                                </View>
+                                <View style={plantStyles.articleItems}>
+                                    <Text style={[plantStyles.teksten, { fontFamily: "Afacad" }]}>Uptime:</Text>
+                                    <Text style={[plantStyles.teksten, plantStyles.tweedeItem, { fontFamily: "Afacad" }]}>
+                                        {item.uptime}%
+                                    </Text>
+                                </View>
+                                <View style={plantStyles.articleItems}>
+                                    <Text style={[plantStyles.teksten, { fontFamily: "Afacad" }]}>Locatie:</Text>
+                                    <Text style={[plantStyles.teksten, plantStyles.tweedeItem, { fontFamily: "Afacad" }]}>
+                                        {item.locatie}
+                                    </Text>
+                                </View>
+                                <View style={plantStyles.articleItems}>
+                                    <Text style={[plantStyles.teksten, { fontFamily: "Afacad" }]}>Grondvochtigheid:</Text>
+                                    <Text style={[plantStyles.teksten, plantStyles.tweedeItem, { fontFamily: "Afacad" }]}>
+                                        {item.grondvochtigheid} ({getGrondvochtigheidStatus(item.grondvochtigheid)})
+                                    </Text>
+                                </View>
+                                <View style={plantStyles.articleItems}>
+                                    <Text style={[plantStyles.teksten, { fontFamily: "Afacad" }]}>Data Ontvangen:</Text>
+                                    <Text style={[plantStyles.teksten, plantStyles.tweedeItem, { fontFamily: "Afacad" }]}>
+                                        {item.dataOntvangen}
+                                    </Text>
+                                </View>
+                            </View>
                         </View>
-                        <View style={[plantStyles.articlesParent, { gap: 10, paddingHorizontal: 5, paddingTop: 5 }]}>
-                            <View style={plantStyles.articleItems}>
-                                <Text style={[plantStyles.teksten, { fontFamily: "Afacad" }]}>Actief:</Text>
-                                <Text style={[plantStyles.teksten, plantStyles.tweedeItem, { fontFamily: "Afacad" }]}>
-                                    {item.actief ? "Ja" : "Nee"}
-                                </Text>
-                            </View>
-                            <View style={plantStyles.articleItems}>
-                                <Text style={[plantStyles.teksten, { fontFamily: "Afacad" }]}>Sensor ID:</Text>
-                                <Text style={[plantStyles.teksten, plantStyles.tweedeItem, { fontFamily: "Afacad" }]}>
-                                    {item.sensorID}
-                                </Text>
-                            </View>
-                            <View style={plantStyles.articleItems}>
-                                <Text style={[plantStyles.teksten, { fontFamily: "Afacad" }]}>Foutmelding:</Text>
-                                <Text style={[plantStyles.teksten, plantStyles.tweedeItem, { fontFamily: "Afacad" }]}>
-                                    {item.foutmelding == null ? "n.v.t." : item.foutmelding}
-                                </Text>
-                            </View>
-                            <View style={plantStyles.articleItems}>
-                                <Text style={[plantStyles.teksten, { fontFamily: "Afacad" }]}>Uptime:</Text>
-                                <Text style={[plantStyles.teksten, plantStyles.tweedeItem, { fontFamily: "Afacad" }]}>
-                                    {item.uptime}%
-                                </Text>
-                            </View>
-                            <View style={plantStyles.articleItems}>
-                                <Text style={[plantStyles.teksten, { fontFamily: "Afacad" }]}>Locatie:</Text>
-                                <Text style={[plantStyles.teksten, plantStyles.tweedeItem, { fontFamily: "Afacad" }]}>
-                                    {item.locatie}
-                                </Text>
-                            </View>
-                            <View style={plantStyles.articleItems}>
-                                <Text style={[plantStyles.teksten, { fontFamily: "Afacad" }]}>Grondvochtigheid:</Text>
-                                <Text style={[plantStyles.teksten, plantStyles.tweedeItem, { fontFamily: "Afacad" }]}>
-                                    {item.grondvochtigheid} ({getGrondvochtigheidStatus(item.grondvochtigheid)})
-                                </Text>
-                            </View>
-                            <View style={plantStyles.articleItems}>
-                                <Text style={[plantStyles.teksten, { fontFamily: "Afacad" }]}>Data Ontvangen:</Text>
-                                <Text style={[plantStyles.teksten, plantStyles.tweedeItem, { fontFamily: "Afacad" }]}>
-                                    {item.dataOntvangen}
-                                </Text>
-                            </View>
-                        </View>
-                    </View>
-                    )}
-                />
-            </View>
-            <ExpandableMenu />
-        </Background>
+                        )}
+                    />
+                </View>
+                <ExpandableMenu />
+            </Background>
+        </ProtectedRoute>
     );
 };
 

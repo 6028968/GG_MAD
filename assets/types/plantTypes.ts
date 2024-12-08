@@ -23,6 +23,7 @@ export type PlantItem = {
     id: number;
     naam: string;
     soort: string;
-    wetenschappelijkeNaam: string;
+    // wetenschappelijkeNaam: string;
     aanwezig: boolean;
+    kant: string;
 };
