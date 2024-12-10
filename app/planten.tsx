@@ -50,7 +50,10 @@ const getIcon = (soort: string, aanwezig: boolean): any => {
     }
 };
 
-const PlantItemComponent: React.FC<{ plant: PlantItem | null }> = ({ plant }) => {
+const PlantItemComponent: React.FC<{ 
+    plant: PlantItem | null;
+    showDeleteButton?: boolean;
+    onDelete?: (id: number) => void; }> = ({ plant, showDeleteButton, onDelete }) => {
     const router = useRouter();
 
     if (!plant) {
@@ -102,6 +105,18 @@ const PlantItemComponent: React.FC<{ plant: PlantItem | null }> = ({ plant }) =>
                 >
                     {plant.soort}
                 </Text>
+                {showDeleteButton && (
+                <TouchableOpacity
+                    style={plantenStyles.deleteButton}
+                    onPress={() => onDelete && onDelete(plant.id)}
+                >
+                    <Image
+                        source={require("@/assets/images/icons/cross.png")}
+                        style={{ width: 40, height: 40 }}
+                        resizeMode="contain"
+                    />
+                </TouchableOpacity>
+            )}
             </View>
         </TouchableOpacity>
     );
@@ -123,6 +138,7 @@ const PlantList: React.FC = () => {
     const [filterAanwezig, setFilterAanwezig] = useState<boolean | null>(null);
     const [isFilterModalVisible, setFilterModalVisible] = useState(false);
     const [isScrollbarVisible, setScrollbarVisible] = useState(false);
+    const [showDeleteButtons, setShowDeleteButtons] = useState(false);
 
     useEffect(() => {
         const loadPlants = async () => {
@@ -209,6 +225,26 @@ const PlantList: React.FC = () => {
             }
         };
         
+    const handleDeletePlant = async (id: number) => 
+        {
+            try 
+            {
+                const updatedPlants = plants.filter((plant) => plant?.id !== id);
+                setPlants(updatedPlants);
+
+                const savedPlants = updatedPlants.filter(Boolean) as PlantItem[];
+                await AsyncStorage.setItem("plants", JSON.stringify(savedPlants));
+            } 
+            catch (error) 
+            {
+                console.error("Fout bij het verwijderen van de plant:", error);
+            }
+        };
+
+    const toggleDeleteMode = () => 
+    {
+        setShowDeleteButtons(!showDeleteButtons);
+    };
 
     const handleScroll = (event: any) => {
         const offsetY = event.nativeEvent.contentOffset.y;
@@ -227,7 +263,12 @@ const PlantList: React.FC = () => {
                     <Text style={plantenStyles.title}>Alle Planten</Text>
                     <FlatList
                         data={filteredPlants}
-                        renderItem={({ item }) => <PlantItemComponent plant={item} />}
+                        renderItem={({ item }) => 
+                            <PlantItemComponent 
+                                plant={item} 
+                                showDeleteButton={showDeleteButtons}
+                                onDelete={handleDeletePlant}
+                            />}
                         keyExtractor={(item, index) => (item ? item.id.toString() : `placeholder-${index}`)}
                         contentContainerStyle={{
                             paddingVertical: 10,
@@ -250,7 +291,7 @@ const PlantList: React.FC = () => {
                     >
                         <Text style={plantenStyles.footerButtonText}>+</Text>
                     </TouchableOpacity>
-                    <TouchableOpacity style={plantenStyles.footerButton}>
+                    <TouchableOpacity style={plantenStyles.footerButton} onPress={toggleDeleteMode}>
                         <MaterialCommunityIcons
                             name="cog"
                             size={50}

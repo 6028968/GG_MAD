@@ -151,5 +151,21 @@ export const plantenStyles = StyleSheet.create({
         color: Colors.light.gray,
         fontWeight: "bold"
     },
-    
+    deleteButton: {
+        position: "absolute",
+        right: 15,
+        top: 25,
+        // backgroundColor: "red",
+        borderRadius: 15,
+        width: 30,
+        height: 30,
+        justifyContent: "center",
+        alignItems: "center",
+        zIndex: 10,
+    },
+    deleteButtonText: {
+        color: "white",
+        fontSize: 18,
+        fontWeight: "bold",
+    },    
 });
