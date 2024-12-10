@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { View, Text, ActivityIndicator, FlatList, Image, StyleSheet, TouchableOpacity } from "react-native";
+import { View, Text, ActivityIndicator, FlatList, Image } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { homeStyles } from "@/constants/HomeStyles";
 import Background from "@/components/Background";
@@ -13,7 +13,6 @@ import ProtectedRoute from "@/components/ProtectedRoute";
 import CustomSwitch from "@/components/CustomSwitch";
 
 const pompIcon = require("@/assets/images/icons/pump.png");
-
 
 const Pompen: React.FC = () => {
     const [loading, setLoading] = useState(true);
@@ -128,15 +127,13 @@ const Pompen: React.FC = () => {
                                 <View style={[plantStyles.articlesParent, { gap: 10, paddingHorizontal: 5, paddingTop: 5 }]}>
                                     {isAdmin ? 
                                     (
-                                    <View style={plantStyles.articleItems}>
-                                        <Text style={[plantStyles.teksten, { fontFamily: "Afacad" }]}>Pomp Aanzetten:</Text>
-                                        <CustomSwitch
-                                            value={switchValues[item.pompID] || false}
-                                            onValueChange={(newValue) =>
-                                                handleSwitchChange(item.pompID, newValue)
-                                            }
-                                        />
-                                    </View>
+                                        <View style={plantStyles.articleItems}>
+                                            <Text style={[plantStyles.teksten, { fontFamily: "Afacad" }]}>Pomp Aanzetten:</Text>
+                                            <CustomSwitch
+                                                value={switchValues[item.pompID] || false}
+                                                onValueChange={(newValue) => handleSwitchChange(item.pompID, newValue)}
+                                            />
+                                        </View>
                                     ) : ("")}
                                     <View style={plantStyles.articleItems}>
                                         <Text style={[plantStyles.teksten, { fontFamily: "Afacad" }]}>Actief:</Text>
@@ -147,7 +144,7 @@ const Pompen: React.FC = () => {
                                                 { fontFamily: "Afacad" },
                                             ]}
                                         >
-                                            {item.actief ? "Ja" : "Nee"}
+                                            {switchValues[item.pompID] ? "Ja" : "Nee"}
                                         </Text>
                                     </View>
                                     <View style={plantStyles.articleItems}>

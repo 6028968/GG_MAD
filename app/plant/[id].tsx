@@ -1,11 +1,10 @@
 import React, { useEffect, useState } from "react";
-import { View, Text, ActivityIndicator, TouchableOpacity, Alert, Modal } from "react-native";
+import { View, Text, ActivityIndicator, TouchableOpacity, Modal } from "react-native";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { homeStyles } from "@/constants/HomeStyles";
 import Background from "@/components/Background";
 import ExpandableMenu from "@/components/MenuDownUnder";
-import { useFonts } from "expo-font";
 import { Plant } from "@/assets/types/plantTypes"
 import { plantStyles } from "@/constants/PlantStyles"
 import ProtectedRoute from "@/components/ProtectedRoute";
@@ -23,12 +22,6 @@ const PlantDetail: React.FC = () => {
     const [isAdmin, setIsAdmin] = useState(false);
     const [isLimitModalVisible, setLimitModalVisible] = useState(false);
     const [fullSide, setFullSide] = useState<"links" | "rechts" | null>(null);
-
-
-    const [fontsLoaded] = useFonts({
-        "Afacad": require("../../assets/fonts/Afacad-Regular.ttf"),
-        "Akaya": require("../../assets/fonts/AkayaKanadaka-Regular.ttf"),
-    });
 
     useEffect(() => {
         const fetchUserRole = async () => {
@@ -203,33 +196,33 @@ const PlantDetail: React.FC = () => {
                 </View>
                 <ExpandableMenu />
 
+                {/* Plant teovoegen modal */}
                 <Modal
-    animationType="slide"
-    transparent={true}
-    visible={isLimitModalVisible}
-    onRequestClose={() => setLimitModalVisible(false)}
->
-    <View style={homeStyles.modalOverlay}>
-        <View style={homeStyles.outerModalContainer}>
-            <View style={homeStyles.modalContainer}>
-                <Text style={homeStyles.modalTitle}>Kant Vol!</Text>
-                <Text style={[homeStyles.inputText, { textAlign: "center", marginBottom: 15 }]}>
-                    De {fullSide === "links" ? "linkerkant" : "rechterkant"} zit vol. 
-                    Zet een plant op afwezig of kies de andere kant.
-                </Text>
-                <TouchableOpacity
-                    style={[homeStyles.button, homeStyles.addButton, { flex: 1, alignSelf: "center", paddingHorizontal: 40 }]}
-                    onPress={() => setLimitModalVisible(false)}
+                    animationType="slide"
+                    transparent={true}
+                    visible={isLimitModalVisible}
+                    onRequestClose={() => setLimitModalVisible(false)}
                 >
-                    <Text style={{ fontFamily: "Akaya", color: "white", fontSize: 20 }}>
-                        OK
-                    </Text>
-                </TouchableOpacity>
-            </View>
-        </View>
-    </View>
-</Modal>
-
+                    <View style={homeStyles.modalOverlay}>
+                        <View style={homeStyles.outerModalContainer}>
+                            <View style={homeStyles.modalContainer}>
+                                <Text style={homeStyles.modalTitle}>Kant Vol!</Text>
+                                <Text style={[homeStyles.inputText, { textAlign: "center", marginBottom: 15 }]}>
+                                    De {fullSide === "links" ? "linkerkant" : "rechterkant"} zit vol. 
+                                    Zet een plant op afwezig of kies de andere kant.
+                                </Text>
+                                <TouchableOpacity
+                                    style={[homeStyles.button, homeStyles.addButton, { flex: 1, alignSelf: "center", paddingHorizontal: 40 }]}
+                                    onPress={() => setLimitModalVisible(false)}
+                                >
+                                    <Text style={{ fontFamily: "Akaya", color: "white", fontSize: 20 }}>
+                                        OK
+                                    </Text>
+                                </TouchableOpacity>
+                            </View>
+                        </View>
+                    </View>
+                </Modal>
             </Background>
         </ProtectedRoute>
     );

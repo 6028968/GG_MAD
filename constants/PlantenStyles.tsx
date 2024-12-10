@@ -50,7 +50,8 @@ export const plantenStyles = StyleSheet.create({
         justifyContent: "center",
         alignItems: "center",
         gap: 40,
-        paddingVertical: 10,
+        paddingTop: 10,
+        paddingBottom: 15,
         borderRadius: 12,
         marginBottom: 35,
         shadowColor: "#000",
@@ -123,7 +124,7 @@ export const plantenStyles = StyleSheet.create({
     bulletButton: {
         flexDirection: "row",
         alignItems: "center",
-        marginVertical: 5,
+        marginVertical: 0,
     },
     
     bulletCircle: {
@@ -154,7 +155,7 @@ export const plantenStyles = StyleSheet.create({
     deleteButton: {
         position: "absolute",
         right: 15,
-        top: 25,
+        top: 20,
         // backgroundColor: "red",
         borderRadius: 15,
         width: 30,

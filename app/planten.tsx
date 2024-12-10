@@ -1,129 +1,23 @@
 import React, { useEffect, useState } from "react";
-import { FlatList, Text, View, TouchableOpacity, StyleSheet, Image, Alert, Modal, TextInput, Switch } from "react-native";
+import { FlatList, Text, View, TouchableOpacity, Alert, Modal, TextInput } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import ProtectedRoute from "../components/ProtectedRoute";
-import { useRouter } from "expo-router";
+import PlantItemComponent from "@/components/PlantItemComponent"
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { PlantItem } from "@/assets/types/plantTypes"
 import { homeStyles } from "@/constants/HomeStyles"
 import Background from "@/components/Background"; 
 import ExpandableMenu from "../components/MenuDownUnder"; 
 import Colors from "@/constants/Colors";
-import { useFonts } from "expo-font";
 import { plantenStyles } from "@/constants/PlantenStyles"
 import DropDownPicker from "react-native-dropdown-picker";
 import CustomSwitch from "@/components/CustomSwitch";
 
-const iconMap: Record<string, Record<string, any>> = {
-    fruit: {
-        available: require("@/assets/images/icons/soort/strawberry.png"),
-        unavailable: require("@/assets/images/icons/soort/strawberry.png"),
-    },
-    groente: {
-        available: require("@/assets/images/icons/soort/carrot.png"),
-        unavailable: require("@/assets/images/icons/soort/carrot.png"),
-    },
-    overig: {
-        available: require("@/assets/images/icons/soort/leaf.png"),
-        unavailable: require("@/assets/images/icons/soort/leaf.png"),
-    },
-    schimmel: {
-        available: require("@/assets/images/icons/soort/mushroom.png"),
-        unavailable: require("@/assets/images/icons/soort/mushroom.png"),
-    },
-    kruiden: {
-        available: require("@/assets/images/icons/soort/salt.png"),
-        unavailable: require("@/assets/images/icons/soort/salt.png"),
-    },
-};
-
-const capitalizeFirstLetter = (string: string): string => {
-    return string.charAt(0).toUpperCase() + string.slice(1).toLowerCase();
-}
-
-const getIcon = (soort: string, aanwezig: boolean): any => {
-    const lowerSoort = soort.toLowerCase();
-    const status = aanwezig ? "available" : "unavailable";
-
-    if (iconMap[lowerSoort]) {
-        return iconMap[lowerSoort][status];
-    }
-};
-
-const PlantItemComponent: React.FC<{ 
-    plant: PlantItem | null;
-    showDeleteButton?: boolean;
-    onDelete?: (id: number) => void; }> = ({ plant, showDeleteButton, onDelete }) => {
-    const router = useRouter();
-
-    if (!plant) {
-        return <View style={[plantenStyles.placeholderItem]} />;
-    }
-
-    const [fontsLoaded] = useFonts({
-        "Afacad": require("../assets/fonts/Afacad-Regular.ttf"),
-        "Akaya": require("../assets/fonts/AkayaKanadaka-Regular.ttf"),
-    });
-
-    const textColor = plant.aanwezig ? "rgb(46, 86, 81)" : "lightgray";
-    const borderColor = plant.aanwezig ? "rgba(171, 211, 174, 1)" : "lightgray";
-    const iconColorBox = plant.aanwezig ? "rgba(171, 211, 174, 1)" : "lightgray";
-
-    return (
-        <TouchableOpacity
-            style={[
-                homeStyles.itemContainer,
-                plant.aanwezig ? plantenStyles.activeItem : plantenStyles.inactiveItem,
-            ]}
-            onPress={() => router.push(`/plant/${plant.id}`)}
-        >
-            <View
-                style={[
-                    [homeStyles.iconContainer, {backgroundColor: iconColorBox}]
-                ]}
-            >
-                <Image
-                    source={getIcon(plant.soort, plant.aanwezig)}
-                    style={{ width: 50, height: 50 }}
-                    resizeMode="contain"
-                />
-            </View>
-            <View style={[homeStyles.labelContainer, { borderColor: borderColor }]}>
-                <Text
-                    style={[
-                        homeStyles.itemLabel,
-                        { fontFamily: "Akaya", color: textColor },
-                    ]}
-                >
-                    {capitalizeFirstLetter(plant.naam)}
-                </Text>
-                <Text
-                    style={[
-                        plantenStyles.plantDetails,
-                        { fontFamily: "Afacad", color: textColor },
-                    ]}
-                >
-                    {plant.soort}
-                </Text>
-                {showDeleteButton && (
-                <TouchableOpacity
-                    style={plantenStyles.deleteButton}
-                    onPress={() => onDelete && onDelete(plant.id)}
-                >
-                    <Image
-                        source={require("@/assets/images/icons/cross.png")}
-                        style={{ width: 40, height: 40 }}
-                        resizeMode="contain"
-                    />
-                </TouchableOpacity>
-            )}
-            </View>
-        </TouchableOpacity>
-    );
-};
-
 const PlantList: React.FC = () => {
     const [plants, setPlants] = useState<(PlantItem | null)[]>([]);
+    const [isAdmin, setIsAdmin] = useState(false);
+    const [user, setUser] = useState<any>(null);
+    const [loading, setLoading] = useState(true);
     const [isModalVisible, setModalVisible] = useState(false);
     const [newPlantName, setNewPlantName] = useState("");
     const [newPlantType, setNewPlantType] = useState("Fruit");
@@ -139,6 +33,29 @@ const PlantList: React.FC = () => {
     const [isFilterModalVisible, setFilterModalVisible] = useState(false);
     const [isScrollbarVisible, setScrollbarVisible] = useState(false);
     const [showDeleteButtons, setShowDeleteButtons] = useState(false);
+    const [isConfirmModalVisible, setConfirmModalVisible] = useState(false);
+    const [plantToDelete, setPlantToDelete] = useState<number | null>(null);
+
+    useEffect(() => {
+        const fetchUser = async () => {
+            try {
+                const storedAuth = await AsyncStorage.getItem("8JUhZ1hcFU1xFzYwf8CeWeNzYpf5ArUb");
+                if (storedAuth) {
+                    const { user } = JSON.parse(storedAuth);
+                    setUser(user);
+                    if (user.role === "admin") {
+                        setIsAdmin(true);
+                    }
+                }
+            } catch (error) {
+                console.error("Fout bij het ophalen van de gebruiker:", error);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchUser();
+    }, []);
 
     useEffect(() => {
         const loadPlants = async () => {
@@ -246,6 +163,28 @@ const PlantList: React.FC = () => {
         setShowDeleteButtons(!showDeleteButtons);
     };
 
+    const confirmDeletePlant = (id: number) => 
+    {
+        setPlantToDelete(id);
+        setConfirmModalVisible(true);
+    };
+    
+    const handleConfirmDelete = async () => 
+    {
+        if (plantToDelete !== null) 
+        {
+            await handleDeletePlant(plantToDelete);
+            setPlantToDelete(null);
+        }
+        setConfirmModalVisible(false);
+    };
+    
+    const handleCancelDelete = () => 
+    {
+        setPlantToDelete(null);
+        setConfirmModalVisible(false);
+    };
+
     const handleScroll = (event: any) => {
         const offsetY = event.nativeEvent.contentOffset.y;
         const contentHeight = event.nativeEvent.contentSize.height;
@@ -255,6 +194,20 @@ const PlantList: React.FC = () => {
         const position = (offsetY / scrollHeight) * (viewHeight - 50);
         setScrollPosition(position);
     };
+
+    const CloseButton: React.FC<{ onPress: () => void }> = ({ onPress }) => (
+        <TouchableOpacity
+            style={{
+                position: "absolute",
+                top: 10,
+                right: 10,
+                zIndex: 1000,
+            }}
+            onPress={onPress}
+        >
+            <MaterialCommunityIcons name="close" size={30} color="darkgray" />
+        </TouchableOpacity>
+    );    
 
     return (
         <ProtectedRoute>
@@ -267,7 +220,7 @@ const PlantList: React.FC = () => {
                             <PlantItemComponent 
                                 plant={item} 
                                 showDeleteButton={showDeleteButtons}
-                                onDelete={handleDeletePlant}
+                                onDelete={confirmDeletePlant}
                             />}
                         keyExtractor={(item, index) => (item ? item.id.toString() : `placeholder-${index}`)}
                         contentContainerStyle={{
@@ -284,27 +237,31 @@ const PlantList: React.FC = () => {
                         </View>
                     )}
                 </View>
-                <View style={plantenStyles.footer}>
-                <TouchableOpacity
-                        style={plantenStyles.footerButton}
-                        onPress={() => setModalVisible(true)}
-                    >
-                        <Text style={plantenStyles.footerButtonText}>+</Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity style={plantenStyles.footerButton} onPress={toggleDeleteMode}>
-                        <MaterialCommunityIcons
-                            name="cog"
-                            size={50}
-                            color={Colors.light.primary}
-                        />
-                    </TouchableOpacity>
-                    <TouchableOpacity style={plantenStyles.footerButton} onPress={() => setFilterModalVisible(true)}>
-                        <MaterialCommunityIcons name="magnify" size={50} color={Colors.light.primary} />
-                    </TouchableOpacity>
-                </View>
-                <ExpandableMenu />
+                {isAdmin ? (
+                    <View style={plantenStyles.footer}>
+                    <TouchableOpacity
+                            style={plantenStyles.footerButton}
+                            onPress={() => setModalVisible(true)}
+                        >
+                            <Text style={plantenStyles.footerButtonText}>+</Text>
+                        </TouchableOpacity>
+                        <TouchableOpacity style={plantenStyles.footerButton} onPress={toggleDeleteMode}>
+                            <MaterialCommunityIcons
+                                name="cog"
+                                size={50}
+                                color={Colors.light.primary}
+                            />
+                        </TouchableOpacity>
+                        <TouchableOpacity style={plantenStyles.footerButton} onPress={() => setFilterModalVisible(true)}>
+                            <MaterialCommunityIcons name="magnify" size={50} color={Colors.light.primary} />
+                        </TouchableOpacity>
+                    </View>
+                ) : (<View style={{marginBottom: 50}}></View>
+                    
+                )}
+                    <ExpandableMenu />
 
-                {/* Modal */}
+                {/* Plant toeveoegen modal */}
                 <Modal
                     animationType="slide"
                     transparent={true}
@@ -314,11 +271,12 @@ const PlantList: React.FC = () => {
                     <View style={homeStyles.modalOverlay}>
                         <View style={homeStyles.outerModalContainer}>
                             <View style={homeStyles.modalContainer}>
+                                <CloseButton onPress={() => setModalVisible(false)} />
                                 <Text style={homeStyles.modalTitle}>Plant Toevoegen</Text>
                                 <View>
                                     <Text style={homeStyles.inputText}>Plant Naam:</Text>
                                     <TextInput
-                                        style={homeStyles.input}
+                                        style={[homeStyles.input, { textAlign: "left" }]}
                                         value={newPlantName}
                                         onChangeText={setNewPlantName}
                                         placeholder=""
@@ -353,7 +311,6 @@ const PlantList: React.FC = () => {
                                             position: "absolute",
                                         }}
                                         textStyle={{
-                                            // textAlign: "center",
                                             fontSize: 16,
                                         }}
                                         placeholderStyle={{
@@ -362,9 +319,6 @@ const PlantList: React.FC = () => {
                                         listItemLabelStyle={{
                                             textAlign: "center",
                                         }}
-                                        // listItemContainerStyle={{
-                                        //     height: 35, 
-                                        // }}
                                         selectedItemLabelStyle={{
                                             fontWeight: "bold",
                                             textAlign: "center",
@@ -385,7 +339,7 @@ const PlantList: React.FC = () => {
                                                 <View style={plantenStyles.bulletCircle}>
                                                     {newPlantLocation === "links" && <View style={plantenStyles.activeCircle} />}
                                                 </View>
-                                                <Text style={[plantenStyles.bulletText, { fontFamily: "Akaya", color: "rgb(46, 86, 81)" }]}>
+                                                <Text style={[plantenStyles.bulletText, { fontFamily: "Afacad", color: "black", fontWeight: "regular"  }]}>
                                                     Links
                                                 </Text>
                                             </TouchableOpacity>
@@ -399,7 +353,7 @@ const PlantList: React.FC = () => {
                                                 <View style={plantenStyles.bulletCircle}>
                                                     {newPlantLocation === "rechts" && <View style={plantenStyles.activeCircle} />}
                                                 </View>
-                                                <Text style={[plantenStyles.bulletText, { fontFamily: "Akaya", color: "rgb(46, 86, 81)" }]}>
+                                                <Text style={[plantenStyles.bulletText, { fontFamily: "Afacad", color: "black", fontWeight: "regular" }]}>
                                                     Rechts
                                                 </Text>
                                             </TouchableOpacity>
@@ -451,6 +405,8 @@ const PlantList: React.FC = () => {
                         </View>
                     </View>
                 </Modal>
+
+                {/* Melding kant is vol modal */}
                 <Modal
                     animationType="slide"
                     transparent={true}
@@ -460,6 +416,7 @@ const PlantList: React.FC = () => {
                     <View style={homeStyles.modalOverlay}>
                         <View style={homeStyles.outerModalContainer}>
                             <View style={homeStyles.modalContainer}>
+                                <CloseButton onPress={() => setLimitModalVisible(false)} />
                                 <Text style={homeStyles.modalTitle}>Kant Vol!</Text>
                                 <Text style={[homeStyles.inputText, { textAlign: "center", marginBottom: 15 }]}>
                                     De {fullSide === "links" ? "linkerkant" : "rechterkant"} zit vol. 
@@ -477,15 +434,18 @@ const PlantList: React.FC = () => {
                         </View>
                     </View>
                 </Modal>
+
+                {/* Filter modal */}
                 <Modal
                     animationType="slide"
                     transparent={true}
                     visible={isFilterModalVisible}
-                    onRequestClose={() => setFilterModalVisible(false)}
+                    onRequestClose={() => setModalVisible(false)}
                 >
                     <View style={homeStyles.modalOverlay}>
                         <View style={homeStyles.outerModalContainer}>
                             <View style={homeStyles.modalContainer}>
+                                <CloseButton onPress={() => setFilterModalVisible(false)} />
                                 <Text style={homeStyles.modalTitle}>Filters</Text>
                                 <Text style={homeStyles.inputText}>Soort:</Text>
                                 <DropDownPicker
@@ -505,7 +465,7 @@ const PlantList: React.FC = () => {
                                 />
                                 <View style={{ marginVertical: 10, flexDirection: "row", justifyContent: "space-between" }}>
                                     <View>
-                                    <Text style={homeStyles.inputText}>Kant:</Text>
+                                    <Text style={[homeStyles.inputText, { marginTop: 5 }]}>Kant:</Text>
                                         <View style={{ flexDirection: "column", alignItems: "flex-start", gap: 10 }}>
                                             <TouchableOpacity
                                                 style={[
@@ -517,7 +477,7 @@ const PlantList: React.FC = () => {
                                                 <View style={plantenStyles.bulletCircle}>
                                                     {filterKant === "links" && <View style={plantenStyles.activeCircle} />}
                                                 </View>
-                                                <Text style={[plantenStyles.bulletText, { fontFamily: "Akaya", color: "rgb(46, 86, 81)" }]}>
+                                                <Text style={[plantenStyles.bulletText, { fontFamily: "Afacad", color: "black", fontWeight: "regular" }]}>
                                                     Links
                                                 </Text>
                                             </TouchableOpacity>
@@ -531,14 +491,14 @@ const PlantList: React.FC = () => {
                                                 <View style={plantenStyles.bulletCircle}>
                                                     {filterKant === "rechts" && <View style={plantenStyles.activeCircle} />}
                                                 </View>
-                                                <Text style={[plantenStyles.bulletText, { fontFamily: "Akaya", color: "rgb(46, 86, 81)" }]}>
+                                                <Text style={[plantenStyles.bulletText, { fontFamily: "Afacad", color: "black", fontWeight: "regular" }]}>
                                                     Rechts
                                                 </Text>
                                             </TouchableOpacity>
                                         </View>
                                     </View>
                                 </View>                                
-                                <Text style={homeStyles.inputText}>Aanwezig:</Text>
+                                <Text style={[homeStyles.inputText, { marginVertical: 5 }]}>Aanwezig:</Text>
                                 <CustomSwitch
                                     value={filterAanwezig === true} 
                                     onValueChange={(value) => setFilterAanwezig(value)} 
@@ -566,7 +526,44 @@ const PlantList: React.FC = () => {
                         </View>
                     </View>
                 </Modal>
-                
+
+                {/* Delete plant modal */}
+                <Modal
+                    animationType="slide"
+                    transparent={true}
+                    visible={isConfirmModalVisible}
+                    onRequestClose={handleCancelDelete}
+                >
+                    <View style={homeStyles.modalOverlay}>
+                        <View style={homeStyles.outerModalContainer}>
+                            <View style={homeStyles.modalContainer}>
+                                <CloseButton onPress={handleCancelDelete} />
+                                <Text style={homeStyles.modalTitle}>Bevestiging</Text>
+                                <Text style={[homeStyles.inputText, { textAlign: "center", marginBottom: 20 }]}>
+                                    Weet je zeker dat je deze plant wilt verwijderen?
+                                </Text>
+                                <View style={homeStyles.buttonContainer}>
+                                    <TouchableOpacity
+                                        style={[homeStyles.button, homeStyles.cancelButton]}
+                                        onPress={handleCancelDelete}
+                                    >
+                                        <Text style={{ fontFamily: "Akaya", color: "white", fontSize: 18 }}>
+                                            Annuleren
+                                        </Text>
+                                    </TouchableOpacity>
+                                    <TouchableOpacity
+                                        style={[homeStyles.button, homeStyles.addButton]}
+                                        onPress={handleConfirmDelete}
+                                    >
+                                        <Text style={{ fontFamily: "Akaya", color: "white", fontSize: 18 }}>
+                                            Verwijderen
+                                        </Text>
+                                    </TouchableOpacity>
+                                </View>
+                            </View>
+                        </View>
+                    </View>
+                </Modal>
             </Background>
         </ProtectedRoute>
     );

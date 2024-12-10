@@ -209,7 +209,7 @@ export default function RegisterScreen() {
                 </View>
             </View>
 
-            {/* Modal */}
+            {/* Modal voor bevestiging van succes */}
             <Modal
                 animationType="slide"
                 transparent={true}

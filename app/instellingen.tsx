@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { View, Text, ActivityIndicator, TextInput, TouchableOpacity, Alert, ScrollView } from "react-native";
+import { View, Text, ActivityIndicator, TextInput, TouchableOpacity, Alert, ScrollView, Modal } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { homeStyles } from "@/constants/HomeStyles";
 import Background from "@/components/Background";
@@ -13,6 +13,7 @@ import ClearStorageButton from "@/components/ClearCache";
 import { router } from "expo-router";
 import ProtectedRoute from "@/components/ProtectedRoute";
 import CustomSwitch from "@/components/CustomSwitch";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
 
 const capitalizeFirstLetter = (string: string): string => {
     return string.charAt(0).toUpperCase() + string.slice(1).toLowerCase();
@@ -34,10 +35,19 @@ const Instellingen: React.FC = () => {
     const [isEmailFocused, setIsEmailFocused] = useState(false);  
     const [isConfirmPasswordFocused, setIsConfirmPasswordFocused] = useState(false);
 
+    const [isSuccessModalVisible, setIsSuccessModalVisible] = useState(false);
+    const [isErrorModalVisible, setIsErrorModalVisible] = useState(false);
+    const [isEmailErrorModalVisible, setIsEmailErrorModalVisible] = useState(false);
+
     const [fontsLoaded] = useFonts({
         "Afacad": require("../assets/fonts/Afacad-Regular.ttf"),
         "Akaya": require("../assets/fonts/AkayaKanadaka-Regular.ttf"),
     });
+
+    const isValidEmail = (email: string) => {
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        return emailRegex.test(email);
+    };    
 
     useEffect(() => {
         const fetchUser = async () => {
@@ -81,54 +91,73 @@ const Instellingen: React.FC = () => {
         }
     };
 
-    const handleUpdate = async () => {
-        try {
-            if (!user) return;
-    
-            const storedUsers = await AsyncStorage.getItem("users");
-            const users = storedUsers ? JSON.parse(storedUsers) : [];
-    
-            const updatedUsers = users.map((u: any) => {
-                if (u.username === user.username && u.email === user.email) { 
-                    return {
-                        ...u,
-                        username: username.trim() || u.username, 
-                        email: email.trim() || u.email,
-                        password: password.trim() && confirmPassword.trim() && password === confirmPassword
-                            ? bcrypt.hashSync(password, 10)
-                            : u.password, 
-                    };
+    const handleUpdate = async () => 
+        {
+            try 
+            {
+                if (!user) return;
+        
+                if (password.trim() && confirmPassword.trim() && password !== confirmPassword) 
+                {
+                    setIsErrorModalVisible(true);
+                    return;
                 }
-                return u;
-            });
-    
-            await AsyncStorage.setItem("users", JSON.stringify(updatedUsers));
-    
-            const updatedUser = {
-                ...user,
-                username: username.trim() || user.username,
-                email: email.trim() || user.email,
-            };
-    
-            await AsyncStorage.setItem(
-                "8JUhZ1hcFU1xFzYwf8CeWeNzYpf5ArUb",
-                JSON.stringify({ user: updatedUser })
-            );
-    
-            Alert.alert("Succes", "Je gegevens zijn bijgewerkt.");
-            setUser(updatedUser);
-    
-            setUsername("");
-            setEmail("");
-            setPassword("");
-            setConfirmPassword("");
-        } catch (error) {
-            console.error("Fout bij het updaten van de gebruiker:", error);
-            Alert.alert("Fout", "Er is iets misgegaan. Probeer opnieuw.");
-        }
-    };
-    
-
+        
+                if (email.trim() && !isValidEmail(email.trim())) 
+                {
+                    setIsEmailErrorModalVisible(true);
+                    return;
+                }
+        
+                const storedUsers = await AsyncStorage.getItem("users");
+                const users = storedUsers ? JSON.parse(storedUsers) : [];
+        
+                const updatedUsers = users.map((u: any) => 
+                {
+                    if (u.username === user.username && u.email === user.email) 
+                    { 
+                        return {
+                            ...u,
+                            username: username.trim() || u.username, 
+                            email: email.trim() || u.email,
+                            password: password.trim()
+                                ? bcrypt.hashSync(password, 10)
+                                : u.password,
+                        };
+                    }
+                    return u;
+                });
+        
+                await AsyncStorage.setItem("users", JSON.stringify(updatedUsers));
+        
+                const updatedUser = {
+                    ...user,
+                    username: username.trim() || user.username,
+                    email: email.trim() || user.email,
+                };
+        
+                await AsyncStorage.setItem(
+                    "8JUhZ1hcFU1xFzYwf8CeWeNzYpf5ArUb",
+                    JSON.stringify({ user: updatedUser })
+                );
+        
+                setUser(updatedUser);
+        
+                setUsername("");
+                setEmail("");
+                setPassword("");
+                setConfirmPassword("");
+        
+                setIsSuccessModalVisible(true);
+            } 
+            catch (error) 
+            {
+                console.error("Fout bij het updaten van de gebruiker:", error);
+                Alert.alert("Fout", "Er is iets misgegaan. Probeer opnieuw.");
+            }
+        };
+        
+        
     if (!fontsLoaded || loading) {
         return <ActivityIndicator size="large" />;
     }
@@ -239,6 +268,122 @@ const Instellingen: React.FC = () => {
                     </View>
                 </ScrollView>
                 <ExpandableMenu />
+
+                {/* Toon gegevens succesvol verwerkt modal */}
+                <Modal
+                    animationType="slide"
+                    transparent={true}
+                    visible={isSuccessModalVisible}
+                    onRequestClose={() => setIsSuccessModalVisible(false)}
+                >
+                    <View style={homeStyles.modalOverlay}>
+                        <View style={homeStyles.outerModalContainer}>
+                            <View style={homeStyles.modalContainer}>
+                                <TouchableOpacity
+                                    style={{
+                                        position: "absolute",
+                                        top: 10,
+                                        right: 10,
+                                        zIndex: 1000,
+                                    }}
+                                    onPress={() => setIsSuccessModalVisible(false)}
+                                >
+                                    <MaterialCommunityIcons name="close" size={30} color="darkgray" />
+                                </TouchableOpacity>
+                                <Text style={homeStyles.modalTitle}>Succes!</Text>
+                                <Text style={[homeStyles.inputText, { textAlign: "center", marginTop: 15 }]}>
+                                    Je gegevens zijn succesvol bijgewerkt.
+                                </Text>
+                                <TouchableOpacity
+                                    style={[homeStyles.button, homeStyles.addButton, { alignSelf: "center", marginTop: 20 }]}
+                                    onPress={() => setIsSuccessModalVisible(false)}
+                                >
+                                    <Text style={{ fontFamily: "Akaya", color: "white", fontSize: 18, paddingHorizontal: 20 }}>
+                                        OKE
+                                    </Text>
+                                </TouchableOpacity>
+                            </View>
+                        </View>
+                    </View>
+                </Modal>
+
+                {/* Toon wachtwoorden komen niet overeen modal */}
+                <Modal
+                    animationType="slide"
+                    transparent={true}
+                    visible={isErrorModalVisible}
+                    onRequestClose={() => setIsErrorModalVisible(false)}
+                >
+                    <View style={homeStyles.modalOverlay}>
+                        <View style={homeStyles.outerModalContainer}>
+                            <View style={homeStyles.modalContainer}>
+                                <TouchableOpacity
+                                    style={{
+                                        position: "absolute",
+                                        top: 10,
+                                        right: 10,
+                                        zIndex: 1000,
+                                    }}
+                                    onPress={() => setIsErrorModalVisible(false)}
+                                >
+                                    <MaterialCommunityIcons name="close" size={30} color="darkgray" />
+                                </TouchableOpacity>
+                                <Text style={homeStyles.modalTitle}>Fout!</Text>
+                                <Text style={[homeStyles.inputText, { textAlign: "center", marginTop: 15 }]}>
+                                    De wachtwoorden komen niet overeen. Probeer opnieuw.
+                                </Text>
+                                <TouchableOpacity
+                                    style={[homeStyles.button, homeStyles.addButton, { alignSelf: "center", marginTop: 20 }]}
+                                    onPress={() => setIsErrorModalVisible(false)}
+                                >
+                                    <Text style={{ fontFamily: "Akaya", color: "white", fontSize: 18, paddingHorizontal: 20 }}>
+                                        OKE
+                                    </Text>
+                                </TouchableOpacity>
+                            </View>
+                        </View>
+                    </View>
+                </Modal>
+
+                {/* Toon e-mail ongeldig formats modal */}
+                <Modal
+                    animationType="slide"
+                    transparent={true}
+                    visible={isEmailErrorModalVisible}
+                    onRequestClose={() => setIsEmailErrorModalVisible(false)}
+                >
+                    <View style={homeStyles.modalOverlay}>
+                        <View style={homeStyles.outerModalContainer}>
+                            <View style={homeStyles.modalContainer}>
+                                <TouchableOpacity
+                                    style={{
+                                        position: "absolute",
+                                        top: 10,
+                                        right: 10,
+                                        zIndex: 1000,
+                                    }}
+                                    onPress={() => setIsEmailErrorModalVisible(false)}
+                                >
+                                    <MaterialCommunityIcons name="close" size={30} color="darkgray" />
+                                </TouchableOpacity>
+                                <Text style={homeStyles.modalTitle}>Fout!</Text>
+                                <Text style={[homeStyles.inputText, { textAlign: "center", marginTop: 15 }]}>
+                                    Het ingevoerde e-mailadres is ongeldig. Probeer opnieuw.
+                                </Text>
+                                <TouchableOpacity
+                                    style={[homeStyles.button, homeStyles.addButton, { alignSelf: "center", marginTop: 20 }]}
+                                    onPress={() => setIsEmailErrorModalVisible(false)}
+                                >
+                                    <Text style={{ fontFamily: "Akaya", color: "white", fontSize: 18, paddingHorizontal: 20 }}>
+                                        OKE
+                                    </Text>
+                                </TouchableOpacity>
+                            </View>
+                        </View>
+                    </View>
+                </Modal>
+
+
             </Background>
         </ProtectedRoute>
     );

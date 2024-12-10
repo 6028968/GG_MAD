@@ -35,7 +35,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
                     username: "test",
                     email: "test@test.nl",
                     password: bcrypt.hashSync("test", 10),
-                    role: "user",
+                    role: "gebruiker",
                     aangemaakt: formatDate(new Date()),
                 };
     

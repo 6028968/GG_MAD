@@ -12,6 +12,7 @@ import { Plant } from "@/assets/types/plantTypes";
 import DropDownPicker from "react-native-dropdown-picker";
 import AdminOnly from "@/components/AdminOnly";
 import { loadPlants, addPlant } from "@/components/PlantAsyncStorage";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const capitalizeFirstLetter = (string: string): string => {
     return string.charAt(0).toUpperCase() + string.slice(1).toLowerCase();
@@ -58,18 +59,35 @@ const InfoSection: React.FC<{ toggle: string }> = ({ toggle }) => {
     const [newItemName, setNewItemName] = useState("");
     const [newItemSoort, setNewItemSoort] = useState("Fruit");
     const [dropdownOpen, setDropdownOpen] = useState(false);
+    const [isAdmin, setIsAdmin] = useState(false);
+
+    useEffect(() => {
+        const fetchUserRole = async () => {
+            try {
+                const storedAuth = await AsyncStorage.getItem("8JUhZ1hcFU1xFzYwf8CeWeNzYpf5ArUb");
+                if (storedAuth) {
+                    const { user } = JSON.parse(storedAuth);
+                    setIsAdmin(user?.role === "admin");
+                }
+            } catch (error) {
+                console.error("Fout bij het ophalen van de gebruikersrol:", error);
+            }
+        };
+
+        fetchUserRole();
+    }, []);
     
     const router = useRouter();
 
     const fillWithPlaceholders = (items: Plant[]): (Plant | "add" | null)[] => {
-        if (items.length >= MAX_ITEMS) 
-        {
+        if (items.length >= MAX_ITEMS) {
             return items;
         }
     
-        const placeholders = Array(MAX_ITEMS - items.length - 1).fill(null); 
-        return [...items, "add", ...placeholders]; 
-    };
+        const placeholders = Array(MAX_ITEMS - items.length - 1).fill(null);
+        const addButton = isAdmin ? "add" : null;
+        return [...items, addButton, ...placeholders];
+    };    
 
     const [fontsLoaded] = useFonts({
         "Afacad": require("../assets/fonts/Afacad-Regular.ttf"),
@@ -149,7 +167,7 @@ const InfoSection: React.FC<{ toggle: string }> = ({ toggle }) => {
             <View style={homeStyles.listContainer}>
             {getCurrentItems().map((plant, index) =>
                 plant === "add" ? (
-                    // "+"-knop
+                    // "+"-knop alleen zichtbaar voor admin
                     <AdminOnly key={`add-button-${toggle}-${index}`}>
                         <TouchableOpacity
                             onPress={handleAddItem}
@@ -161,7 +179,7 @@ const InfoSection: React.FC<{ toggle: string }> = ({ toggle }) => {
                 ) : plant ? (
                     // Plant item
                     <TouchableOpacity
-                        key={`plant-${plant.id}`} 
+                        key={`plant-${plant.id}`}
                         onPress={() => router.push(`/plant/${plant.id}`)}
                         style={homeStyles.itemContainer}
                     >
@@ -180,8 +198,8 @@ const InfoSection: React.FC<{ toggle: string }> = ({ toggle }) => {
                         </View>
                     </TouchableOpacity>
                 ) : (
-                // Placeholder
-                <View key={`placeholder-${index}`} style={homeStyles.dottedItem} />
+                    // Placeholder
+                    <View key={`placeholder-${index}`} style={homeStyles.dottedItem} />
                 )
             )}
             </View>
@@ -274,47 +292,44 @@ const InfoSection: React.FC<{ toggle: string }> = ({ toggle }) => {
     );
 };
 
-    const HomeScreen: React.FC = () => 
-        {
-            const [toggle, setToggle] = useState("Links");
+const HomeScreen: React.FC = () => 
+{
+    const [toggle, setToggle] = useState("Links");
+    const [fontsLoaded] = useFonts({
+        "Akaya": require("../assets/fonts/AkayaKanadaka-Regular.ttf"),
+    });
+    if (!fontsLoaded) 
+    {
+        return null;
+    }
 
-            const [fontsLoaded] = useFonts({
-                "Akaya": require("../assets/fonts/AkayaKanadaka-Regular.ttf"),
-            });
+    return (
+        <ProtectedRoute>
+            <Background>
+                <ScrollView contentContainerStyle={homeStyles.scrollViewContent}>
+                    <WeatherForecast />
 
-            if (!fontsLoaded) 
-            {
-                return null;
-            }
-        
-            return (
-                <ProtectedRoute>
-                    <Background>
-                        <ScrollView contentContainerStyle={homeStyles.scrollViewContent}>
-                            <WeatherForecast />
-        
-                            <View style={homeStyles.toggleContainer}>
-                                <TouchableOpacity
-                                    style={[homeStyles.toggleButtonLeft, toggle === "Links" && homeStyles.activeButton]}
-                                    onPress={() => setToggle("Links")}
-                                >
-                                    <Text style={[homeStyles.toggleText, toggle === "Links" && homeStyles.activeText, { fontFamily: "Akaya" }]}>Links</Text>
-                                </TouchableOpacity>
-                                <TouchableOpacity
-                                    style={[homeStyles.toggleButtonRight, toggle === "Rechts" && homeStyles.activeButton]}
-                                    onPress={() => setToggle("Rechts")}
-                                >
-                                    <Text style={[homeStyles.toggleText, toggle === "Rechts" && homeStyles.activeText, { fontFamily: "Akaya" }]}>Rechts</Text>
-                                </TouchableOpacity>
-                            </View>
-        
-                            <InfoSection toggle={toggle} />
-                        </ScrollView>
-                        <ExpandableMenu />
-                    </Background>
-                </ProtectedRoute>
-            );
-        };
+                    <View style={homeStyles.toggleContainer}>
+                        <TouchableOpacity
+                            style={[homeStyles.toggleButtonLeft, toggle === "Links" && homeStyles.activeButton]}
+                            onPress={() => setToggle("Links")}
+                        >
+                            <Text style={[homeStyles.toggleText, toggle === "Links" && homeStyles.activeText, { fontFamily: "Akaya" }]}>Links</Text>
+                        </TouchableOpacity>
+                        <TouchableOpacity
+                            style={[homeStyles.toggleButtonRight, toggle === "Rechts" && homeStyles.activeButton]}
+                            onPress={() => setToggle("Rechts")}
+                        >
+                            <Text style={[homeStyles.toggleText, toggle === "Rechts" && homeStyles.activeText, { fontFamily: "Akaya" }]}>Rechts</Text>
+                        </TouchableOpacity>
+                    </View>
+
+                    <InfoSection toggle={toggle} />
+                </ScrollView>
+                <ExpandableMenu />
+            </Background>
+        </ProtectedRoute>
+    );
+};
 
 export default HomeScreen;
-

@@ -140,6 +140,12 @@ const Sensoren: React.FC = () => {
                                     </Text>
                                 </View>
                                 <View style={plantStyles.articleItems}>
+                                    <Text style={[plantStyles.teksten, { fontFamily: "Afacad" }]}>Naam:</Text>
+                                    <Text style={[plantStyles.teksten, plantStyles.tweedeItem, { fontFamily: "Afacad" }]}>
+                                        {item.deviceNaam}
+                                    </Text>
+                                </View>
+                                <View style={plantStyles.articleItems}>
                                     <Text style={[plantStyles.teksten, { fontFamily: "Afacad" }]}>Sensor ID:</Text>
                                     <Text style={[plantStyles.teksten, plantStyles.tweedeItem, { fontFamily: "Afacad" }]}>
                                         {item.sensorID}

@@ -13,7 +13,7 @@
 
 ## --- Planten ---
 
-- [ ] De 3 knoppen onderaan werkend maken
+- [x] De 3 knoppen onderaan werkend maken
 
 ## --- Enkele plant ---
 
@@ -31,7 +31,7 @@
 
 ## --- Pompen ---
 
-- [ ] Optie toevoegen voor admin om pompen te beheren?
+- [x] Optie toevoegen voor admin om pompen te beheren?
 
 ## --- Logboek ---
 
