@@ -10,7 +10,8 @@ export const sensorStyles = StyleSheet.create({
         flex: 1,
     },
     flatList: {
-        paddingVertical: 45,
+        paddingTop: 10,
+        paddingBottom: 40,
     },
     titleView: {
         flexDirection: "row",

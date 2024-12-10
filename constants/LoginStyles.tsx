@@ -63,7 +63,7 @@ export const LoginStyles = StyleSheet.create({
     },
     input: 
     {
-        height: 55,
+        height: 45,
         borderColor: Colors.light.primary,
         borderWidth: 3,
         borderRadius: 30,

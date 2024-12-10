@@ -119,7 +119,7 @@ export default function RegisterScreen() {
                             style={[
                                 LoginStyles.input,
                                 isUsernameFocused && LoginStyles.inputFocused,
-                                { fontFamily: "Afacad" },
+                                { fontFamily: "Afacad", height: 55 },
                             ]}
                             placeholder={isUsernameFocused ? "" : "Gebruikersnaam"}
                             placeholderTextColor="rgba(203, 203, 203, 0.5)"
@@ -134,7 +134,7 @@ export default function RegisterScreen() {
                             style={[
                                 LoginStyles.input,
                                 isEmailFocused && LoginStyles.inputFocused,
-                                { fontFamily: "Afacad" },
+                                { fontFamily: "Afacad", height: 55 },
                             ]}
                             placeholder={isEmailFocused ? "" : "E-mailadres"}
                             placeholderTextColor="rgba(203, 203, 203, 0.5)"
@@ -149,7 +149,7 @@ export default function RegisterScreen() {
                             style={[
                                 LoginStyles.input,
                                 isPasswordFocused && LoginStyles.inputFocused,
-                                { fontFamily: "Afacad" },
+                                { fontFamily: "Afacad", height: 55 },
                             ]}
                             placeholder={isPasswordFocused ? "" : "Wachtwoord"}
                             placeholderTextColor="rgba(203, 203, 203, 0.5)"
@@ -165,7 +165,7 @@ export default function RegisterScreen() {
                             style={[
                                 LoginStyles.input,
                                 isConfirmPasswordFocused && LoginStyles.inputFocused,
-                                { fontFamily: "Afacad" },
+                                { fontFamily: "Afacad", height: 55 },
                             ]}
                             placeholder={isConfirmPasswordFocused ? "" : "Herhaal wachtwoord"}
                             placeholderTextColor="rgba(203, 203, 203, 0.5)"

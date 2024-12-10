@@ -132,6 +132,10 @@ const PlantDetail: React.FC = () => {
                                 <Text style={[plantStyles.teksten, { fontFamily: "Afacad" }]}>Dagen in Kas:</Text>
                                 <Text style={[plantStyles.teksten, plantStyles.tweedeItem, { fontFamily: "Afacad" }]}>{plant.dagenInKas}</Text>
                             </View>
+                            <View style={plantStyles.articleItems}>
+                                <Text style={[plantStyles.teksten, { fontFamily: "Afacad" }]}>Kant:</Text>
+                                <Text style={[plantStyles.teksten, plantStyles.tweedeItem, { fontFamily: "Afacad" }]}>{capitalizeFirstLetter(plant.kant)}</Text>
+                            </View>
                         </View>
                         <View style={plantStyles.paddingView}>
                             <View style={plantStyles.articleItems}>

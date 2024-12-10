@@ -8,7 +8,8 @@ const itemWidth = (width / 5) - (margin * 3);
 export const plantStyles = StyleSheet.create({
     container: {
         gap: 8,
-        marginTop: 40,
+        marginTop: 10,
+        // justifyContent: "center",
         marginHorizontal: 8,
         flex: 1,
     },

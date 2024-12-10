@@ -13,7 +13,7 @@ export const homeStyles = StyleSheet.create({
     },
     weerContainer:
     {
-        marginTop: 20,
+        // marginTop: 20,
         paddingVertical: 10, 
     },
     item: 
@@ -72,8 +72,8 @@ export const homeStyles = StyleSheet.create({
     scrollViewContent: 
     {
         flexGrow: 1,
-        paddingBottom: 65,
-        margin: 10,
+        paddingBottom: 50,
+        marginHorizontal: 10,
     },
     infoSectionContainer: 
     {

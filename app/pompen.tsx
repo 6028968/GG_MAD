@@ -113,7 +113,7 @@ const Pompen: React.FC = () => {
                                 style={[
                                     homeStyles.infoSectionContainer,
                                     plantStyles.articlesParent,
-                                    { marginHorizontal: 10, marginBottom: 15, paddingTop: 10, paddingBottom: 0 },
+                                    { marginHorizontal: 10, marginBottom: 10, paddingTop: 10, paddingBottom: 0 },
                                 ]}
                             >
                                 <View

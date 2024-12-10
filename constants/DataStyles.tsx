@@ -9,11 +9,11 @@ export const dataStyles = StyleSheet.create({
     uitklapbaarMenu:
     { 
         marginHorizontal: 10, 
-        marginBottom: 15, 
+        marginBottom: 10, 
         // paddingTop: 10, 
         paddingBottom: 25, 
         gap: 0, 
-        marginTop: 40,
+        marginTop: 10,
     },
     uitklapMenuTitle:
     { 

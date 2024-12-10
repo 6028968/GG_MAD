@@ -12,7 +12,7 @@ export const plantenStyles = StyleSheet.create({
         borderColor: Colors.light.primary,
         borderRadius: 20,
         backgroundColor: "rgba(255, 255, 255, 0.8)",
-        marginTop: 40,
+        marginTop: 10,
         marginHorizontal: 10,
         flex: 1,
         // Android
@@ -50,7 +50,7 @@ export const plantenStyles = StyleSheet.create({
         justifyContent: "center",
         alignItems: "center",
         gap: 40,
-        paddingVertical: 16,
+        paddingVertical: 10,
         borderRadius: 12,
         marginBottom: 35,
         shadowColor: "#000",
@@ -59,8 +59,8 @@ export const plantenStyles = StyleSheet.create({
         shadowRadius: 4,
     },
     footerButton: {
-        width: 75,
-        height: 75,
+        width: 65,
+        height: 65,
         borderRadius: 40,
         backgroundColor: "white",
         justifyContent: "center",

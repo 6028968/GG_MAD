@@ -56,7 +56,7 @@ export default function ForgotPasswordScreen()
                         <TextInput
                             style={[
                                 LoginStyles.input,
-                                isEmailFocused && LoginStyles.inputFocused 
+                                isEmailFocused && LoginStyles.inputFocused, { height: 55} 
                             ]}
                             placeholder={isEmailFocused ? "" : "E-mailadres"} 
                             placeholderTextColor="rgba(203, 203, 203, 0.5)"

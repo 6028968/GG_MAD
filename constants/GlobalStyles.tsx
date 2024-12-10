@@ -62,7 +62,7 @@ export const GlobalStyles = StyleSheet.create({
     scrollViewContent: 
     {
         flexGrow: 1,
-        paddingBottom: 65,
+        paddingBottom: 50,
     },
     button: 
     {
