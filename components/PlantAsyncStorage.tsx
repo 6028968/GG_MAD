@@ -62,7 +62,7 @@ const defaultPlants: Plant[] = [
         aankomendeBemesting: "Over 2 dagen",
         meestSuccesvolleMaand: "Juni",
         meestSuccesvolleSeizoen: "Zomer",
-        kant: "links",
+        kant: "Links",
     },
     {
         id: 2,
@@ -82,7 +82,7 @@ const defaultPlants: Plant[] = [
         aankomendeBemesting: "Over 3 dagen",
         meestSuccesvolleMaand: "Mei",
         meestSuccesvolleSeizoen: "Lente",
-        kant: "rechts",
+        kant: "Rechts",
     },
 ];
 

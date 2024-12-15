@@ -1,3 +1,5 @@
+import { StyleProp, TextStyle } from "react-native";
+
 export interface ValidationErrors {
     username?: string;
     email?: string;
@@ -134,4 +136,10 @@ export interface KasResponse {
     };
     sensoren: Record<string, Sensor>;
     logboek: Logboek;
+}
+
+export interface DynamicWidthInputProps {
+    value: string | number;
+    onChangeText: (value: string) => void;
+    style?: StyleProp<TextStyle>;
 }

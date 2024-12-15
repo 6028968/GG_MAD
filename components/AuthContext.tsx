@@ -73,7 +73,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
                         aankomendeBemesting: "Over 2 dagen",
                         meestSuccesvolleMaand: "Juni",
                         meestSuccesvolleSeizoen: "Zomer",
-                        kant: "links",
+                        kant: "Links",
                     },
                     {
                         id: 2,
@@ -93,7 +93,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
                         aankomendeBemesting: "Over 3 dagen",
                         meestSuccesvolleMaand: "Mei",
                         meestSuccesvolleSeizoen: "Lente",
-                        kant: "rechts",
+                        kant: "Rechts",
                     },
                     {
                         id: 3,
@@ -113,7 +113,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
                         aankomendeBemesting: "Niet nodig",
                         meestSuccesvolleMaand: "Oktober",
                         meestSuccesvolleSeizoen: "Herfst",
-                        kant: "rechts",
+                        kant: "Rechts",
                     },
                     {
                         id: 4,
@@ -133,7 +133,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
                         aankomendeBemesting: "Volgende week",
                         meestSuccesvolleMaand: "Juli",
                         meestSuccesvolleSeizoen: "Zomer",
-                        kant: "rechts",
+                        kant: "Rechts",
                     },
                     {
                         id: 5,
@@ -153,7 +153,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
                         aankomendeBemesting: "Over 2 dagen",
                         meestSuccesvolleMaand: "Juli",
                         meestSuccesvolleSeizoen: "Zomer",
-                        kant: "rechts",
+                        kant: "Rechts",
                     },
                     {
                         id: 6,
@@ -173,7 +173,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
                         aankomendeBemesting: "Over 3 dagen",
                         meestSuccesvolleMaand: "Augustus",
                         meestSuccesvolleSeizoen: "Zomer",
-                        kant: "rechts",
+                        kant: "Rechts",
                     },
                     {
                         id: 7,
@@ -193,7 +193,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
                         aankomendeBemesting: "Over 2 dagen",
                         meestSuccesvolleMaand: "Juli",
                         meestSuccesvolleSeizoen: "Zomer",
-                        kant: "rechts",
+                        kant: "Rechts",
                     },
                     {
                         id: 8,
@@ -213,7 +213,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
                         aankomendeBemesting: "Over 2 dagen",
                         meestSuccesvolleMaand: "Maart",
                         meestSuccesvolleSeizoen: "Lente",
-                        kant: "rechts",
+                        kant: "Rechts",
                     },
                     {
                         id: 9,
@@ -233,7 +233,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
                         aankomendeBemesting: "Over 3 dagen",
                         meestSuccesvolleMaand: "April",
                         meestSuccesvolleSeizoen: "Lente",
-                        kant: "links",
+                        kant: "Links",
                     },
                     {
                         id: 10,
@@ -253,7 +253,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
                         aankomendeBemesting: "n.v.t.",
                         meestSuccesvolleMaand: "Maart",
                         meestSuccesvolleSeizoen: "Lente",
-                        kant: "links",
+                        kant: "Links",
                     },
                     {
                         id: 11,
@@ -273,7 +273,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
                         aankomendeBemesting: "Over 1 week",
                         meestSuccesvolleMaand: "Juli",
                         meestSuccesvolleSeizoen: "Zomer",
-                        kant: "rechts",
+                        kant: "Rechts",
                     },                    
                 ];                
     
@@ -300,7 +300,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
             if (user && bcrypt.compareSync(password, user.password)) 
             {
                 const auth = { user };
-                await AsyncStorage.setItem("8JUhZ1hcFU1xFzYwf8CeWeNzYpf5ArUb", JSON.stringify(auth));
+                await AsyncStorage.setItem("admin", JSON.stringify(auth));
                 setCurrentUser(user);
                 setIsAuthenticated(true);
                 setErrorMessage("");
@@ -312,7 +312,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     };        
 
     const logout = async () => {
-        await AsyncStorage.removeItem("8JUhZ1hcFU1xFzYwf8CeWeNzYpf5ArUb");
+        await AsyncStorage.removeItem("admin");
         setIsAuthenticated(false);
         router.push("/");
     };

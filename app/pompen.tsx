@@ -29,7 +29,7 @@ const Pompen: React.FC = () => {
     useEffect(() => {
         const fetchUserRole = async () => {
             try {
-                const storedAuth = await AsyncStorage.getItem("8JUhZ1hcFU1xFzYwf8CeWeNzYpf5ArUb");
+                const storedAuth = await AsyncStorage.getItem("admin");
                 if (storedAuth) {
                     const { user } = JSON.parse(storedAuth);
                     if (user.role === "admin") {

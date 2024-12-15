@@ -16,7 +16,7 @@ export type Plant = {
     aankomendeBemesting: string;
     meestSuccesvolleMaand: string;
     meestSuccesvolleSeizoen: string;
-    kant: "links" | "rechts";
+    kant: "Links" | "Rechts";
 };
 
 export type PlantItem = {

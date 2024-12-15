@@ -21,14 +21,14 @@ const PlantList: React.FC = () => {
     const [isModalVisible, setModalVisible] = useState(false);
     const [newPlantName, setNewPlantName] = useState("");
     const [newPlantType, setNewPlantType] = useState("Fruit");
-    const [newPlantLocation, setNewPlantLocation] = useState<"links" | "rechts">("links");
+    const [newPlantLocation, setNewPlantLocation] = useState<"Links" | "Rechts">("Links");
     const [isPlantPresent, setIsPlantPresent] = useState(true);
     const [scrollPosition, setScrollPosition] = useState(0);
     const [dropdownOpen, setDropdownOpen] = useState(false);
     const [isLimitModalVisible, setLimitModalVisible] = useState(false);
-    const [fullSide, setFullSide] = useState<"links" | "rechts" | null>(null);
+    const [fullSide, setFullSide] = useState<"Links" | "Rechts" | null>(null);
     const [filterSoort, setFilterSoort] = useState<string | null>(null);
-    const [filterKant, setFilterKant] = useState<"links" | "rechts" | null>(null);
+    const [filterKant, setFilterKant] = useState<"Links" | "Rechts" | null>(null);
     const [filterAanwezig, setFilterAanwezig] = useState<boolean | null>(null);
     const [isFilterModalVisible, setFilterModalVisible] = useState(false);
     const [isScrollbarVisible, setScrollbarVisible] = useState(false);
@@ -39,7 +39,7 @@ const PlantList: React.FC = () => {
     useEffect(() => {
         const fetchUser = async () => {
             try {
-                const storedAuth = await AsyncStorage.getItem("8JUhZ1hcFU1xFzYwf8CeWeNzYpf5ArUb");
+                const storedAuth = await AsyncStorage.getItem("admin");
                 if (storedAuth) {
                     const { user } = JSON.parse(storedAuth);
                     setUser(user);
@@ -131,7 +131,7 @@ const PlantList: React.FC = () => {
         
                 setNewPlantName("");
                 setNewPlantType("Fruit");
-                setNewPlantLocation("links");
+                setNewPlantLocation("Links");
                 setIsPlantPresent(true);
                 setModalVisible(false);
             } 
@@ -332,12 +332,12 @@ const PlantList: React.FC = () => {
                                             <TouchableOpacity
                                                 style={[
                                                     plantenStyles.bulletButton,
-                                                    newPlantLocation === "links" && plantenStyles.activeBullet,
+                                                    newPlantLocation === "Links" && plantenStyles.activeBullet,
                                                 ]}
-                                                onPress={() => setNewPlantLocation("links")}
+                                                onPress={() => setNewPlantLocation("Links")}
                                             >
                                                 <View style={plantenStyles.bulletCircle}>
-                                                    {newPlantLocation === "links" && <View style={plantenStyles.activeCircle} />}
+                                                    {newPlantLocation === "Links" && <View style={plantenStyles.activeCircle} />}
                                                 </View>
                                                 <Text style={[plantenStyles.bulletText, { fontFamily: "Afacad", color: "black", fontWeight: "regular"  }]}>
                                                     Links
@@ -346,12 +346,12 @@ const PlantList: React.FC = () => {
                                             <TouchableOpacity
                                                 style={[
                                                     plantenStyles.bulletButton,
-                                                    newPlantLocation === "rechts" && plantenStyles.activeBullet,
+                                                    newPlantLocation === "Rechts" && plantenStyles.activeBullet,
                                                 ]}
-                                                onPress={() => setNewPlantLocation("rechts")}
+                                                onPress={() => setNewPlantLocation("Rechts")}
                                             >
                                                 <View style={plantenStyles.bulletCircle}>
-                                                    {newPlantLocation === "rechts" && <View style={plantenStyles.activeCircle} />}
+                                                    {newPlantLocation === "Rechts" && <View style={plantenStyles.activeCircle} />}
                                                 </View>
                                                 <Text style={[plantenStyles.bulletText, { fontFamily: "Afacad", color: "black", fontWeight: "regular" }]}>
                                                     Rechts
@@ -419,7 +419,7 @@ const PlantList: React.FC = () => {
                                 <CloseButton onPress={() => setLimitModalVisible(false)} />
                                 <Text style={homeStyles.modalTitle}>Kant Vol!</Text>
                                 <Text style={[homeStyles.inputText, { textAlign: "center", marginBottom: 15 }]}>
-                                    De {fullSide === "links" ? "linkerkant" : "rechterkant"} zit vol. 
+                                    De {fullSide === "Links" ? "linkerkant" : "rechterkant"} zit vol. 
                                     Zet een plant op afwezig of kies de andere kant.
                                 </Text>
                                 <TouchableOpacity
@@ -470,12 +470,12 @@ const PlantList: React.FC = () => {
                                             <TouchableOpacity
                                                 style={[
                                                     plantenStyles.bulletButton,
-                                                    filterKant === "links" && plantenStyles.activeBullet,
+                                                    filterKant === "Links" && plantenStyles.activeBullet,
                                                 ]}
-                                                onPress={() => setFilterKant("links")}
+                                                onPress={() => setFilterKant("Links")}
                                             >
                                                 <View style={plantenStyles.bulletCircle}>
-                                                    {filterKant === "links" && <View style={plantenStyles.activeCircle} />}
+                                                    {filterKant === "Links" && <View style={plantenStyles.activeCircle} />}
                                                 </View>
                                                 <Text style={[plantenStyles.bulletText, { fontFamily: "Afacad", color: "black", fontWeight: "regular" }]}>
                                                     Links
@@ -484,12 +484,12 @@ const PlantList: React.FC = () => {
                                             <TouchableOpacity
                                                 style={[
                                                     plantenStyles.bulletButton,
-                                                    filterKant === "rechts" && plantenStyles.activeBullet,
+                                                    filterKant === "Rechts" && plantenStyles.activeBullet,
                                                 ]}
-                                                onPress={() => setFilterKant("rechts")}
+                                                onPress={() => setFilterKant("Rechts")}
                                             >
                                                 <View style={plantenStyles.bulletCircle}>
-                                                    {filterKant === "rechts" && <View style={plantenStyles.activeCircle} />}
+                                                    {filterKant === "Rechts" && <View style={plantenStyles.activeCircle} />}
                                                 </View>
                                                 <Text style={[plantenStyles.bulletText, { fontFamily: "Afacad", color: "black", fontWeight: "regular" }]}>
                                                     Rechts

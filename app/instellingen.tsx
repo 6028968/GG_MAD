@@ -52,7 +52,7 @@ const Instellingen: React.FC = () => {
     useEffect(() => {
         const fetchUser = async () => {
             try {
-                const storedAuth = await AsyncStorage.getItem("8JUhZ1hcFU1xFzYwf8CeWeNzYpf5ArUb");
+                const storedAuth = await AsyncStorage.getItem("admin");
                 if (storedAuth) {
                     const { user } = JSON.parse(storedAuth);
                     setUser(user);
@@ -80,7 +80,7 @@ const Instellingen: React.FC = () => {
             const updatedUsers = users.filter((u: any) => u.username !== user.username);
 
             await AsyncStorage.setItem("users", JSON.stringify(updatedUsers));
-            await AsyncStorage.removeItem("8JUhZ1hcFU1xFzYwf8CeWeNzYpf5ArUb");
+            await AsyncStorage.removeItem("admin");
 
             Alert.alert("Account verwijderd", "Je account is succesvol verwijderd.");
             
@@ -137,7 +137,7 @@ const Instellingen: React.FC = () => {
                 };
         
                 await AsyncStorage.setItem(
-                    "8JUhZ1hcFU1xFzYwf8CeWeNzYpf5ArUb",
+                    "admin",
                     JSON.stringify({ user: updatedUser })
                 );
         

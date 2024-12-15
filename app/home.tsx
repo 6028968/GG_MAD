@@ -64,7 +64,7 @@ const InfoSection: React.FC<{ toggle: string }> = ({ toggle }) => {
     useEffect(() => {
         const fetchUserRole = async () => {
             try {
-                const storedAuth = await AsyncStorage.getItem("8JUhZ1hcFU1xFzYwf8CeWeNzYpf5ArUb");
+                const storedAuth = await AsyncStorage.getItem("admin");
                 if (storedAuth) {
                     const { user } = JSON.parse(storedAuth);
                     setIsAdmin(user?.role === "admin");
@@ -103,8 +103,8 @@ const InfoSection: React.FC<{ toggle: string }> = ({ toggle }) => {
             const plants = await loadPlants();
             const filteredPlants = plants.filter((plant) => plant.aanwezig);
     
-            const leftSide = filteredPlants.filter((plant) => plant.kant === "links");
-            const rightSide = filteredPlants.filter((plant) => plant.kant === "rechts");
+            const leftSide = filteredPlants.filter((plant) => plant.kant === "Links");
+            const rightSide = filteredPlants.filter((plant) => plant.kant === "Rechts");
     
             setLeftItems(leftSide);
             setRightItems(rightSide);
@@ -134,15 +134,15 @@ const InfoSection: React.FC<{ toggle: string }> = ({ toggle }) => {
                 aankomendeBemesting: "n.v.t.",
                 meestSuccesvolleMaand: "n.v.t.",
                 meestSuccesvolleSeizoen: "n.v.t.",
-                kant: toggle.toLowerCase() as "links" | "rechts",
+                kant:  toggle === "Links" || toggle === "Rechts" ? toggle : "Links",
             };
     
             const updatedPlants = await addPlant(newPlant);
-            if (newPlant.kant === "links") 
+            if (newPlant.kant === "Links") 
             {
                 setLeftItems((prev) => [...prev, newPlant]);
             } 
-            else if (newPlant.kant === "rechts") 
+            else if (newPlant.kant === "Rechts") 
             {
                 setRightItems((prev) => [...prev, newPlant]);
             }
