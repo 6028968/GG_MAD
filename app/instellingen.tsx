@@ -39,6 +39,9 @@ const Instellingen: React.FC = () => {
     const [isErrorModalVisible, setIsErrorModalVisible] = useState(false);
     const [isEmailErrorModalVisible, setIsEmailErrorModalVisible] = useState(false);
 
+    const [isDeleteModalVisible, setIsDeleteModalVisible] = useState(false);
+    const [deleteType, setDeleteType] = useState<"account" | "database" | null>(null);
+
     const [fontsLoaded] = useFonts({
         "Afacad": require("../assets/fonts/Afacad-Regular.ttf"),
         "Akaya": require("../assets/fonts/AkayaKanadaka-Regular.ttf"),
@@ -90,6 +93,22 @@ const Instellingen: React.FC = () => {
             Alert.alert("Fout", "Er is iets misgegaan. Probeer opnieuw.");
         }
     };
+
+    const confirmDelete = (type: "account" | "database") => {
+        setDeleteType(type);
+        setIsDeleteModalVisible(true);
+    };
+    
+    const handleConfirmDelete = async () => {
+        if (deleteType === "account") {
+            await deleteAccount();
+        } else if (deleteType === "database") {
+            await AsyncStorage.clear();
+            Alert.alert("Database gewist", "Alle gegevens zijn succesvol gewist.");
+        }
+        setIsDeleteModalVisible(false);
+    };
+    
 
     const handleUpdate = async () => 
         {
@@ -259,9 +278,9 @@ const Instellingen: React.FC = () => {
                                 </View>
                             </View>
                             <View style={plantStyles.articleItems}>
-                                <TouchableOpacity style={[]} onPress={deleteAccount}>
-                                    <Text style={GlobalStyles.gevaarTekst}>Verwijder account</Text>
-                                </TouchableOpacity>
+                            <TouchableOpacity onPress={() => confirmDelete("account")}>
+                                <Text style={GlobalStyles.gevaarTekst}>Verwijder account</Text>
+                            </TouchableOpacity>
                                 {isAdmin ? (<ClearStorageButton />) : ("")}
                             </View>
                         </View>
@@ -383,6 +402,40 @@ const Instellingen: React.FC = () => {
                     </View>
                 </Modal>
 
+                {/* Modal ter bevestiging of het account verwijderd moet worden */}
+                <Modal
+                    animationType="slide"
+                    transparent={true}
+                    visible={isDeleteModalVisible}
+                    onRequestClose={() => setIsDeleteModalVisible(false)}
+                >
+                    <View style={homeStyles.modalOverlay}>
+                        <View style={homeStyles.outerModalContainer}>
+                            <View style={homeStyles.modalContainer}>
+                                <Text style={homeStyles.modalTitle}>Account Verwijderen</Text>
+                                <Text style={[homeStyles.inputText, { textAlign: "center", marginBottom: 15 }]}>
+                                    Weet je zeker dat je{" "}
+                                    {deleteType === "account" ? "je account" : "de database"} wilt verwijderen?
+                                    Dit kan niet ongedaan worden gemaakt.
+                                </Text>
+                                <View style={{ flexDirection: "row", justifyContent: "space-around" }}>
+                                    <TouchableOpacity
+                                        style={[homeStyles.button, homeStyles.addButton]}
+                                        onPress={handleConfirmDelete}
+                                    >
+                                        <Text style={{ fontFamily: "Akaya", color: "white", fontSize: 18 }}>Ja</Text>
+                                    </TouchableOpacity>
+                                    <TouchableOpacity
+                                        style={[homeStyles.button, homeStyles.cancelButton]}
+                                        onPress={() => setIsDeleteModalVisible(false)}
+                                    >
+                                        <Text style={{ fontFamily: "Akaya", color: "white", fontSize: 18 }}>Nee</Text>
+                                    </TouchableOpacity>
+                                </View>
+                            </View>
+                        </View>
+                    </View>
+                </Modal>
 
             </Background>
         </ProtectedRoute>

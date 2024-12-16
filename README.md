@@ -76,6 +76,13 @@ Voor het testen van admin-functionaliteiten:
     - Gebruikersnaam: admin
     - Wachtwoord: admin
 
+Voor het testen van een normale gebruiker:
+
+    - Gebruikersnaam: test
+    - Wachtwoord: test
+
+P.S.: Je kan ook zelf een normale gebruiker aanmaken!
+
 ## Implementaties 📋
 
 ### **Kernfunctionaliteiten**

@@ -52,41 +52,83 @@ const PlantDetail: React.FC = () => {
     const [isLimitModalVisible, setLimitModalVisible] = useState(false);
     const [fullSide, setFullSide] = useState<"Links" | "Rechts" | null>(null);
     const [textWidth, setTextWidth] = useState(0);
+    const [editedKant, setEditedKant] = useState<string | null>(null);
+    const [originalKant, setOriginalKant] = useState<"Links" | "Rechts" | null>(null);
 
-    const toggleEditMode = () => 
-    {
-        if (isEditable) 
-        {
+    const toggleEditMode = () => {
+        if (!isEditable) {
+            setOriginalKant(plant?.kant || null);
+            setEditedKant(plant?.kant || null); 
+        } else {
             saveChanges();
         }
         setIsEditable((prev) => !prev);
     };
-        
 
-    const updateField = (field: keyof Plant, value: string) => {
+    const updateField = async (field: keyof Plant, value: string) => {
         if (!plant) return;
-        setPlant({ ...plant, [field]: value });
+    
+        if (field === "kant" && value !== plant.kant) {
+            try {
+                const savedPlants = await AsyncStorage.getItem("plants");
+                const parsedPlants: Plant[] = savedPlants ? JSON.parse(savedPlants) : [];
+    
+                const plantsOnNewSide = parsedPlants.filter(
+                    (p) => p.kant === value && p.aanwezig && p.id !== plant.id
+                );
+    
+                if (plantsOnNewSide.length >= 8) {
+                    setFullSide(value as "Links" | "Rechts");
+                    setLimitModalVisible(true);
+                    return;
+                }
+    
+                setPlant({ ...plant, [field]: value as "Links" | "Rechts" });
+            } catch (error) {
+                console.error("Fout bij het controleren van de kant:", error);
+            }
+        } else {
+            setPlant({ ...plant, [field]: value });
+        }
     };
 
     const saveChanges = async () => {
         if (!plant) return;
-
-        try {
-            const savedPlants = await AsyncStorage.getItem("plants");
-            const parsedPlants: Plant[] = savedPlants ? JSON.parse(savedPlants) : [];
-
-            const updatedPlants = parsedPlants.map((p) =>
-                p.id === plant.id ? plant : p
-            );
-
-            await AsyncStorage.setItem("plants", JSON.stringify(updatedPlants));
-            setIsEditable(false);
-
-            // router.push("/home");
-        } catch (error) {
-            console.error("Fout bij het opslaan van wijzigingen:", error);
+    
+        if (editedKant !== plant.kant) {
+            try {
+                const savedPlants = await AsyncStorage.getItem("plants");
+                const parsedPlants: Plant[] = savedPlants ? JSON.parse(savedPlants) : [];
+    
+                const plantsOnNewSide = parsedPlants.filter(
+                    (p) => p.kant === editedKant && p.aanwezig && p.id !== plant.id
+                );
+    
+                if (plantsOnNewSide.length >= 8) {
+                    setFullSide(editedKant as "Links" | "Rechts");
+                    setLimitModalVisible(true);
+                    setEditedKant(originalKant);
+                    return;
+                }
+    
+                const updatedPlant = { ...plant, kant: editedKant as "Links" | "Rechts" };
+                setPlant(updatedPlant);
+    
+                const updatedPlants = parsedPlants.map((p) =>
+                    p.id === plant.id ? updatedPlant : p
+                );
+    
+                await AsyncStorage.setItem("plants", JSON.stringify(updatedPlants));
+                setOriginalKant(editedKant as "Links" | "Rechts");
+            } catch (error) {
+                console.error("Fout bij het opslaan van wijzigingen:", error);
+            }
         }
+    
+        setIsEditable(false);
     };
+    
+    
 
     useEffect(() => {
         const fetchUserRole = async () => {
@@ -267,8 +309,8 @@ const PlantDetail: React.FC = () => {
                                     >
                                         {isEditable ? (
                                             <DynamicWidthInput
-                                                value={capitalizeFirstLetter(plant?.kant || "")}
-                                                onChangeText={(value: any) => updateField("kant", value)}
+                                                value={capitalizeFirstLetter(editedKant || "")}
+                                                onChangeText={(value) => setEditedKant(value)}
                                                 style={[plantStyles.teksten, plantStyles.tweedeItem, { fontFamily: "Afacad", color: "orange" }]}
                                             />
                                         ) : (
@@ -320,7 +362,6 @@ const PlantDetail: React.FC = () => {
                                 </View>
                                 <View style={plantStyles.articleItems}>
                                     <Text style={[plantStyles.teksten, { fontFamily: "Afacad" }]}>Succesvolle Oogst:</Text>
-                                    {/* <Text style={[plantStyles.teksten, plantStyles.tweedeItem, { fontFamily: "Afacad" }]}>{plant.succesvolleOogst}</Text> */}
                                     <Text 
                                         style={[plantStyles.teksten, plantStyles.tweedeItem, { fontFamily: "Afacad" }]}
                                         onLayout={(event) => {
@@ -345,7 +386,6 @@ const PlantDetail: React.FC = () => {
                             <View style={plantStyles.borderContainer}>
                                 <View style={plantStyles.articleItems}>
                                     <Text style={[plantStyles.teksten, { fontFamily: "Afacad" }]}>Naam:</Text>
-                                    {/* <Text style={[plantStyles.teksten, plantStyles.tweedeItem, { fontFamily: "Afacad" }]}>{capitalizeFirstLetter(plant.naam)}</Text> */}
                                     <Text 
                                         style={[plantStyles.teksten, plantStyles.tweedeItem, { fontFamily: "Afacad" }]}
                                         onLayout={(event) => {
@@ -367,7 +407,6 @@ const PlantDetail: React.FC = () => {
                                 </View>
                                 <View style={plantStyles.articleItems}>
                                     <Text style={[plantStyles.teksten, { fontFamily: "Afacad" }]}>Wetenschappelijke Naam:</Text>
-                                    {/* <Text style={[plantStyles.teksten, plantStyles.tweedeItem, { fontFamily: "Afacad" }]}>{plant.wetenschappelijkeNaam}</Text> */}
                                     <Text 
                                         style={[plantStyles.teksten, plantStyles.tweedeItem, { fontFamily: "Afacad" }]}
                                         onLayout={(event) => {
@@ -391,7 +430,6 @@ const PlantDetail: React.FC = () => {
                             <View style={plantStyles.borderContainer}>
                                 <View style={plantStyles.articleItems}>
                                     <Text style={[plantStyles.teksten, { fontFamily: "Afacad" }]}>Zonlicht:</Text>
-                                    {/* <Text style={[plantStyles.teksten, plantStyles.tweedeItem, { fontFamily: "Afacad" }]}>{plant.zonlicht}</Text> */}
                                     <Text 
                                         style={[plantStyles.teksten, plantStyles.tweedeItem, { fontFamily: "Afacad" }]}
                                         onLayout={(event) => {
@@ -413,7 +451,6 @@ const PlantDetail: React.FC = () => {
                                 </View>
                                 <View style={plantStyles.articleItems}>
                                     <Text style={[plantStyles.teksten, { fontFamily: "Afacad" }]}>Irrigatie Frequentie:</Text>
-                                    {/* <Text style={[plantStyles.teksten, plantStyles.tweedeItem, { fontFamily: "Afacad" }]}>{plant.irrigatieFrequentie}</Text> */}
                                     <Text 
                                         style={[plantStyles.teksten, plantStyles.tweedeItem, { fontFamily: "Afacad" }]}
                                         onLayout={(event) => {
@@ -435,7 +472,6 @@ const PlantDetail: React.FC = () => {
                                 </View>
                                 <View style={plantStyles.articleItems}>
                                     <Text style={[plantStyles.teksten, { fontFamily: "Afacad" }]}>Laatste Irrigratie:</Text>
-                                    {/* <Text style={[plantStyles.teksten, plantStyles.tweedeItem, { fontFamily: "Afacad" }]}>{plant.laatsteIrrigratie}</Text> */}
                                     <Text 
                                         style={[plantStyles.teksten, plantStyles.tweedeItem, { fontFamily: "Afacad" }]}
                                         onLayout={(event) => {
@@ -457,7 +493,6 @@ const PlantDetail: React.FC = () => {
                                 </View>
                                 <View style={plantStyles.articleItems}>
                                     <Text style={[plantStyles.teksten, { fontFamily: "Afacad" }]}>Aankomende Irrigratie:</Text>
-                                    {/* <Text style={[plantStyles.teksten, plantStyles.tweedeItem, { fontFamily: "Afacad" }]}>{plant.aankomendeIrrigratie}</Text> */}
                                     <Text 
                                         style={[plantStyles.teksten, plantStyles.tweedeItem, { fontFamily: "Afacad" }]}
                                         onLayout={(event) => {
@@ -479,7 +514,6 @@ const PlantDetail: React.FC = () => {
                                 </View>
                                 <View style={plantStyles.articleItems}>
                                     <Text style={[plantStyles.teksten, { fontFamily: "Afacad" }]}>Laatste Bemesting:</Text>
-                                    {/* <Text style={[plantStyles.teksten, plantStyles.tweedeItem, { fontFamily: "Afacad" }]}>{plant.laatsteBemesting}</Text> */}
                                     <Text 
                                         style={[plantStyles.teksten, plantStyles.tweedeItem, { fontFamily: "Afacad" }]}
                                         onLayout={(event) => {
@@ -501,7 +535,6 @@ const PlantDetail: React.FC = () => {
                                 </View>
                                 <View style={plantStyles.articleItems}>
                                     <Text style={[plantStyles.teksten, { fontFamily: "Afacad" }]}>Aankomende Bemesting:</Text>
-                                    {/* <Text style={[plantStyles.teksten, plantStyles.tweedeItem, { fontFamily: "Afacad" }]}>{plant.aankomendeBemesting}</Text> */}
                                     <Text 
                                         style={[plantStyles.teksten, plantStyles.tweedeItem, { fontFamily: "Afacad" }]}
                                         onLayout={(event) => {
@@ -525,7 +558,6 @@ const PlantDetail: React.FC = () => {
                             <View style={plantStyles.paddingView}>
                                 <View style={plantStyles.articleItems}>
                                     <Text style={[plantStyles.teksten, { fontFamily: "Afacad" }]}>Meest Succesvolle Maand:</Text>
-                                    {/* <Text style={[plantStyles.teksten, plantStyles.tweedeItem, { fontFamily: "Afacad" }]}>{plant.meestSuccesvolleMaand}</Text> */}
                                     <Text 
                                         style={[plantStyles.teksten, plantStyles.tweedeItem, { fontFamily: "Afacad" }]}
                                         onLayout={(event) => {
@@ -547,7 +579,6 @@ const PlantDetail: React.FC = () => {
                                 </View>
                                 <View style={plantStyles.articleItems}>
                                     <Text style={[plantStyles.teksten, { fontFamily: "Afacad" }]}>Meest Succesvolle Seizoen:</Text>
-                                    {/* <Text style={[plantStyles.teksten, plantStyles.tweedeItem, { fontFamily: "Afacad" }]}>{plant.meestSuccesvolleSeizoen}</Text> */}
                                     <Text 
                                         style={[plantStyles.teksten, plantStyles.tweedeItem, { fontFamily: "Afacad" }]}
                                         onLayout={(event) => {

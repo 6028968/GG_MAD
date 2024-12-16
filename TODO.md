@@ -17,13 +17,13 @@
 
 ## --- Enkele plant ---
 
-- [ ] Zorg dat er een optie is voor de Beheerder om de gegevens van de plant aan te passen
-- [ ] Zorg dat de kant van de plant gewijzigd kan worden
+- [x] Zorg dat er een optie is voor de Beheerder om de gegevens van de plant aan te passen
+- [x] Zorg dat de kant van de plant gewijzigd kan worden
 
 ## --- Settings ---
 
 - [ ] Eventueel meldingen ontvangen in orde maken
-- [ ] Evnetueel een modal maken of je echt je gegevens/account wissen of database wissen wilt uitvoeren
+- [x] Evnetueel een modal maken of je echt je gegevens/account wissen of database wissen wilt uitvoeren
 
 ## --- Sensoren ---
 
