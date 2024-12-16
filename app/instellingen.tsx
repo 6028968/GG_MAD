@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { View, Text, ActivityIndicator, TextInput, TouchableOpacity, Alert, ScrollView, Modal } from "react-native";
+import { View, Text, ActivityIndicator, TextInput, TouchableOpacity, Alert, ScrollView, Modal, Platform } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { homeStyles } from "@/constants/HomeStyles";
 import Background from "@/components/Background";
@@ -14,10 +14,47 @@ import { router } from "expo-router";
 import ProtectedRoute from "@/components/ProtectedRoute";
 import CustomSwitch from "@/components/CustomSwitch";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
+import * as Notifications from "expo-notifications";
+import * as Device from "expo-device";
 
 const capitalizeFirstLetter = (string: string): string => {
     return string.charAt(0).toUpperCase() + string.slice(1).toLowerCase();
 }
+
+const sendNotification = async (message: string) => 
+    {
+        if (Platform.OS === "web") 
+        {
+            // Log in de terminal voor webontwikkeling
+            console.log(`Melding: ${message}`);
+        } 
+        else 
+        {
+            if (Device.isDevice) 
+            {
+                // Vraag toestemming
+                const { status } = await Notifications.requestPermissionsAsync();
+                if (status !== "granted") 
+                {
+                    console.log("Toestemming geweigerd voor notificaties!");
+                    return;
+                }
+    
+                // Stuur een lokale notificatie
+                await Notifications.scheduleNotificationAsync({
+                    content: {
+                        title: "Melding",
+                        body: message,
+                    },
+                    trigger: null, // Direct versturen
+                });
+            } 
+            else 
+            {
+                console.log("Notificaties werken niet op een simulator.");
+            }
+        }
+    };
 
 const Instellingen: React.FC = () => {
     const [loading, setLoading] = useState(true);
@@ -41,6 +78,34 @@ const Instellingen: React.FC = () => {
 
     const [isDeleteModalVisible, setIsDeleteModalVisible] = useState(false);
     const [deleteType, setDeleteType] = useState<"account" | "database" | null>(null);
+
+    const [notificationsEnabled, setNotificationsEnabled] = useState(false);
+
+useEffect(() => {
+    // Meldingen status ophalen uit AsyncStorage
+    const fetchNotificationSettings = async () => {
+        try {
+            const storedValue = await AsyncStorage.getItem("notificationsEnabled");
+            if (storedValue !== null) {
+                setNotificationsEnabled(JSON.parse(storedValue));
+            }
+        } catch (error) {
+            console.error("Fout bij het ophalen van meldingsinstellingen:", error);
+        }
+    };
+
+    fetchNotificationSettings();
+}, []);
+
+const handleNotificationSwitch = async (value: boolean) => {
+    try {
+        setNotificationsEnabled(value);
+        await AsyncStorage.setItem("notificationsEnabled", JSON.stringify(value));
+        console.log("Meldingen ontvangen is:", value ? "Ingeschakeld" : "Uitgeschakeld");
+    } catch (error) {
+        console.error("Fout bij het opslaan van meldingsinstellingen:", error);
+    }
+};
 
     const [fontsLoaded] = useFonts({
         "Afacad": require("../assets/fonts/Afacad-Regular.ttf"),
@@ -272,10 +337,18 @@ const Instellingen: React.FC = () => {
                         </View>
                         <View style={[homeStyles.infoSectionContainer, plantStyles.articlesParent]}>
                             <View style={plantStyles.borderContainer}>
-                                <View style={plantStyles.articleItems}>
+                                {/* <View style={plantStyles.articleItems}>
                                     <Text style={[plantStyles.teksten, { fontFamily: "Afacad" }]}>Meldingen ontvangen:</Text>
                                     <CustomSwitch value={switchValue} onValueChange={setSwitchValue} />
-                                </View>
+                                </View> */}
+                            <View style={plantStyles.articleItems}>
+    <Text style={[plantStyles.teksten, { fontFamily: "Afacad" }]}>Meldingen ontvangen:</Text>
+    <CustomSwitch
+        value={notificationsEnabled}
+        onValueChange={handleNotificationSwitch}
+    />
+</View>
+
                             </View>
                             <View style={plantStyles.articleItems}>
                             <TouchableOpacity onPress={() => confirmDelete("account")}>

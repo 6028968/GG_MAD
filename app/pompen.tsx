@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { View, Text, ActivityIndicator, FlatList, Image } from "react-native";
+import { View, Text, ActivityIndicator, FlatList, Image, Platform } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { homeStyles } from "@/constants/HomeStyles";
 import Background from "@/components/Background";
@@ -11,6 +11,8 @@ import { sensorStyles } from "@/constants/SensorStyles";
 import { pompStyles } from "@/constants/PompStyles";
 import ProtectedRoute from "@/components/ProtectedRoute";
 import CustomSwitch from "@/components/CustomSwitch";
+import * as Notifications from "expo-notifications";
+import * as Device from "expo-device";
 
 const pompIcon = require("@/assets/images/icons/pump.png");
 
@@ -20,6 +22,15 @@ const Pompen: React.FC = () => {
     const [pompen, setPompen] = useState<Pomp[]>([]);
     const [error, setError] = useState<string | null>(null);
     const [switchValues, setSwitchValues] = useState<{ [key: number]: boolean }>({});
+    const [notificationsEnabled, setNotificationsEnabled] = useState<boolean>(false);
+
+useEffect(() => {
+    const fetchNotificationSettings = async () => {
+        const storedValue = await AsyncStorage.getItem("notificationsEnabled");
+        setNotificationsEnabled(JSON.parse(storedValue || "false"));
+    };
+    fetchNotificationSettings();
+}, []);
 
     const [fontsLoaded] = useFonts({
         "Afacad": require("../assets/fonts/Afacad-Regular.ttf"),
@@ -76,13 +87,73 @@ const Pompen: React.FC = () => {
         fetchPompData();
     }, []);
 
-    const handleSwitchChange = (pompID: number, newValue: boolean) => {
+    const sendNotification = async (message: string) => {
+        if (Platform.OS === "web") {
+            console.log(`Melding: ${message}`);
+        } else {
+            if (Device.isDevice) {
+                const { status } = await Notifications.requestPermissionsAsync();
+                if (status !== "granted") {
+                    console.log("Toestemming geweigerd voor notificaties!");
+                    return;
+                }
+    
+                await Notifications.scheduleNotificationAsync({
+                    content: {
+                        title: "Melding",
+                        body: message,
+                    },
+                    trigger: null, // Direct versturen
+                });
+            } else {
+                console.log("Notificaties werken niet op een simulator.");
+            }
+        }
+    };
+
+    // const handleSwitchChange = (pompID: number, newValue: boolean) => {
+    //     setSwitchValues((prevValues) => ({
+    //         ...prevValues,
+    //         [pompID]: newValue,
+    //     }));
+    // };
+
+    // const handleSwitchChange = async (pompID: number, newValue: boolean) => {
+    //     setSwitchValues((prevValues) => ({
+    //         ...prevValues,
+    //         [pompID]: newValue,
+    //     }));
+    
+    //     try {
+    //         // Controleer of meldingen zijn ingeschakeld
+    //         const notificationsEnabled = await AsyncStorage.getItem("notificationsEnabled");
+    //         if (JSON.parse(notificationsEnabled || "false") && newValue) {
+    //             const pompNaam = pompID === 1 ? "Links" : "Rechts";
+    //             console.log(`Notificatie: Pomp ${pompNaam} is aangezet.`);
+    //         }
+    //     } catch (error) {
+    //         console.error("Fout bij het versturen van notificaties:", error);
+    //     }
+    // };
+    const handleSwitchChange = async (pompID: number, newValue: boolean) => {
         setSwitchValues((prevValues) => ({
             ...prevValues,
             [pompID]: newValue,
         }));
+    
+        if (notificationsEnabled && newValue) {
+            const pompNaam = pompID === 1 ? "Links" : "Rechts";
+            sendNotification(`Pomp ${pompNaam} is aangezet.`);
+        }
+        else
+        {
+            const pompNaam = pompID === 1 ? "Links" : "Rechts";
+            sendNotification(`Pomp ${pompNaam} is uitgezet.`)
+        }
     };
-
+    
+    
+    
     if (!fontsLoaded || loading) {
         return <ActivityIndicator size="large" />;
     }
