@@ -11,8 +11,6 @@ import { sensorStyles } from "@/constants/SensorStyles";
 import { pompStyles } from "@/constants/PompStyles";
 import ProtectedRoute from "@/components/ProtectedRoute";
 import CustomSwitch from "@/components/CustomSwitch";
-import * as Notifications from "expo-notifications";
-import * as Device from "expo-device";
 
 const pompIcon = require("@/assets/images/icons/pump.png");
 
@@ -87,72 +85,26 @@ useEffect(() => {
         fetchPompData();
     }, []);
 
-    const sendNotification = async (message: string) => {
-        if (Platform.OS === "web") {
-            console.log(`Melding: ${message}`);
-        } else {
-            if (Device.isDevice) {
-                const { status } = await Notifications.requestPermissionsAsync();
-                if (status !== "granted") {
-                    console.log("Toestemming geweigerd voor notificaties!");
-                    return;
-                }
-    
-                await Notifications.scheduleNotificationAsync({
-                    content: {
-                        title: "Melding",
-                        body: message,
-                    },
-                    trigger: null, // Direct versturen
-                });
-            } else {
-                console.log("Notificaties werken niet op een simulator.");
-            }
-        }
-    };
-
-    // const handleSwitchChange = (pompID: number, newValue: boolean) => {
-    //     setSwitchValues((prevValues) => ({
-    //         ...prevValues,
-    //         [pompID]: newValue,
-    //     }));
-    // };
-
-    // const handleSwitchChange = async (pompID: number, newValue: boolean) => {
-    //     setSwitchValues((prevValues) => ({
-    //         ...prevValues,
-    //         [pompID]: newValue,
-    //     }));
-    
-    //     try {
-    //         // Controleer of meldingen zijn ingeschakeld
-    //         const notificationsEnabled = await AsyncStorage.getItem("notificationsEnabled");
-    //         if (JSON.parse(notificationsEnabled || "false") && newValue) {
-    //             const pompNaam = pompID === 1 ? "Links" : "Rechts";
-    //             console.log(`Notificatie: Pomp ${pompNaam} is aangezet.`);
-    //         }
-    //     } catch (error) {
-    //         console.error("Fout bij het versturen van notificaties:", error);
-    //     }
-    // };
     const handleSwitchChange = async (pompID: number, newValue: boolean) => {
         setSwitchValues((prevValues) => ({
             ...prevValues,
             [pompID]: newValue,
         }));
     
-        if (notificationsEnabled && newValue) {
-            const pompNaam = pompID === 1 ? "Links" : "Rechts";
-            sendNotification(`Pomp ${pompNaam} is aangezet.`);
-        }
-        else
-        {
-            const pompNaam = pompID === 1 ? "Links" : "Rechts";
-            sendNotification(`Pomp ${pompNaam} is uitgezet.`)
+        const storedAuth = await AsyncStorage.getItem("admin");
+        if (storedAuth) {
+            const { user } = JSON.parse(storedAuth);
+    
+            if (user?.notificatie && newValue) {
+                const pompNaam = pompID === 1 ? "Links" : "Rechts";
+                console.log(`Melding: Pomp ${pompNaam} is aangezet.`);
+            }
+            else
+            {
+                console.log(`Melding: Pomp ${pompID === 1 ? "Links" : "Rechts"} is uitgezet.`);
+            }
         }
     };
-    
-    
     
     if (!fontsLoaded || loading) {
         return <ActivityIndicator size="large" />;

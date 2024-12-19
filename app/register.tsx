@@ -94,6 +94,7 @@ export default function RegisterScreen() {
             password: hashedPassword,
             role: "gebruiker",
             aangemaakt: formatDate(new Date()),
+            notificatie: false
         };
     
         users.push(newUser);

@@ -13,6 +13,7 @@ export interface User {
     password: string;
     role: string;
     aangemaakt: string;
+    notificatie: boolean;
 }
 
 export interface AdminOnlyProps {

@@ -24,6 +24,7 @@
 
 - [ ] Eventueel meldingen ontvangen in orde maken
 - [x] Evnetueel een modal maken of je echt je gegevens/account wissen of database wissen wilt uitvoeren
+- [ ] Fixxen dat bij het deletne van de database ook de gebruiker naar de loginpagina wordt gestuurd
 
 ## --- Sensoren ---
 

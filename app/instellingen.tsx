@@ -9,103 +9,99 @@ import { plantStyles } from "@/constants/PlantStyles";
 import bcrypt from "bcryptjs";
 import { LoginStyles } from "@/constants/LoginStyles";
 import { GlobalStyles } from "@/constants/GlobalStyles";
-import ClearStorageButton from "@/components/ClearCache";
 import { router } from "expo-router";
 import ProtectedRoute from "@/components/ProtectedRoute";
 import CustomSwitch from "@/components/CustomSwitch";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
-import * as Notifications from "expo-notifications";
-import * as Device from "expo-device";
 
 const capitalizeFirstLetter = (string: string): string => {
     return string.charAt(0).toUpperCase() + string.slice(1).toLowerCase();
 }
 
-const sendNotification = async (message: string) => 
-    {
-        if (Platform.OS === "web") 
-        {
-            // Log in de terminal voor webontwikkeling
-            console.log(`Melding: ${message}`);
-        } 
-        else 
-        {
-            if (Device.isDevice) 
-            {
-                // Vraag toestemming
-                const { status } = await Notifications.requestPermissionsAsync();
-                if (status !== "granted") 
-                {
-                    console.log("Toestemming geweigerd voor notificaties!");
-                    return;
-                }
-    
-                // Stuur een lokale notificatie
-                await Notifications.scheduleNotificationAsync({
-                    content: {
-                        title: "Melding",
-                        body: message,
-                    },
-                    trigger: null, // Direct versturen
-                });
-            } 
-            else 
-            {
-                console.log("Notificaties werken niet op een simulator.");
-            }
-        }
-    };
-
 const Instellingen: React.FC = () => {
     const [loading, setLoading] = useState(true);
     const [isAdmin, setIsAdmin] = useState(false);
     const [user, setUser] = useState<any>(null);
-    const [switchValue, setSwitchValue] = useState(false);
-
     const [username, setUsername] = useState("");
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [confirmPassword, setConfirmPassword] = useState("");
-
     const [isUsernameFocused, setIsUsernameFocused] = useState(false);
     const [isPasswordFocused, setIsPasswordFocused] = useState(false);   
     const [isEmailFocused, setIsEmailFocused] = useState(false);  
     const [isConfirmPasswordFocused, setIsConfirmPasswordFocused] = useState(false);
-
     const [isSuccessModalVisible, setIsSuccessModalVisible] = useState(false);
     const [isErrorModalVisible, setIsErrorModalVisible] = useState(false);
     const [isEmailErrorModalVisible, setIsEmailErrorModalVisible] = useState(false);
-
-    const [isDeleteModalVisible, setIsDeleteModalVisible] = useState(false);
-    const [deleteType, setDeleteType] = useState<"account" | "database" | null>(null);
-
     const [notificationsEnabled, setNotificationsEnabled] = useState(false);
+    const [isAuthenticated, setIsAuthenticated] = useState(false);
+    const [isAccountModalVisible, setIsAccountModalVisible] = useState(false);
+    const [isDatabaseModalVisible, setIsDatabaseModalVisible] = useState(false);
 
-useEffect(() => {
-    // Meldingen status ophalen uit AsyncStorage
-    const fetchNotificationSettings = async () => {
+    const confirmAccountDelete = () => {
+        setIsAccountModalVisible(true);
+    };
+
+    const confirmDatabaseDelete = () => {
+        setIsDatabaseModalVisible(true);
+    };
+
+    const handleAccountDelete = async () => {
         try {
-            const storedValue = await AsyncStorage.getItem("notificationsEnabled");
-            if (storedValue !== null) {
-                setNotificationsEnabled(JSON.parse(storedValue));
-            }
+            await deleteAccount();
+            setIsAccountModalVisible(false);
         } catch (error) {
-            console.error("Fout bij het ophalen van meldingsinstellingen:", error);
+            console.error("Fout bij account verwijderen:", error);
         }
     };
 
-    fetchNotificationSettings();
-}, []);
+    const handleDatabaseDelete = async () => {
+        try {
+            await AsyncStorage.clear();
+            Alert.alert("Database gewist", "Alle gegevens zijn succesvol gewist.");
+            setIsDatabaseModalVisible(false);
+            router.replace("/");
+        } catch (error) {
+            console.error("Fout bij database wissen:", error);
+        }
+    };
 
-const handleNotificationSwitch = async (value: boolean) => {
-    try {
-        setNotificationsEnabled(value);
-        await AsyncStorage.setItem("notificationsEnabled", JSON.stringify(value));
-        console.log("Meldingen ontvangen is:", value ? "Ingeschakeld" : "Uitgeschakeld");
-    } catch (error) {
-        console.error("Fout bij het opslaan van meldingsinstellingen:", error);
-    }
-};
+    useEffect(() => {
+        const fetchNotificationSettings = async () => {
+            try {
+                const storedValue = await AsyncStorage.getItem("notificationsEnabled");
+                if (storedValue !== null) {
+                    setNotificationsEnabled(JSON.parse(storedValue));
+                }
+            } catch (error) {
+                console.error("Fout bij het ophalen van meldingsinstellingen:", error);
+            }
+        };
+
+        fetchNotificationSettings();
+    }, []);
+
+    const handleNotificationSwitch = async (value: boolean) => {
+        try {
+            setNotificationsEnabled(value);
+
+            const storedUsers = await AsyncStorage.getItem("users");
+            const users = storedUsers ? JSON.parse(storedUsers) : [];
+            const updatedUsers = users.map((u: any) =>
+                u.username === user.username ? { ...u, notificatie: value } : u
+            );
+
+            await AsyncStorage.setItem("users", JSON.stringify(updatedUsers));
+
+            const updatedUser = { ...user, notificatie: value };
+            await AsyncStorage.setItem("admin", JSON.stringify({ user: updatedUser }));
+            setUser(updatedUser);
+
+            console.log("Meldingen ontvangen is:", value ? "Ingeschakeld" : "Uitgeschakeld");
+        } catch (error) {
+            console.error("Fout bij het opslaan van meldingsinstellingen:", error);
+        }
+    };
 
     const [fontsLoaded] = useFonts({
         "Afacad": require("../assets/fonts/Afacad-Regular.ttf"),
@@ -127,6 +123,8 @@ const handleNotificationSwitch = async (value: boolean) => {
                     if (user.role === "admin") {
                         setIsAdmin(true);
                     }
+    
+                    setNotificationsEnabled(user.notificatie || false);
                 }
             } catch (error) {
                 console.error("Fout bij het ophalen van de gebruiker:", error);
@@ -134,10 +132,10 @@ const handleNotificationSwitch = async (value: boolean) => {
                 setLoading(false);
             }
         };
-
+    
         fetchUser();
     }, []);
-
+    
     const deleteAccount = async () => {
         try {
             if (!user) return;
@@ -159,22 +157,12 @@ const handleNotificationSwitch = async (value: boolean) => {
         }
     };
 
-    const confirmDelete = (type: "account" | "database") => {
-        setDeleteType(type);
-        setIsDeleteModalVisible(true);
+    const logout = async () => {
+        await AsyncStorage.removeItem("admin");
+        setIsAuthenticated(false);
+        router.push("/");
     };
-    
-    const handleConfirmDelete = async () => {
-        if (deleteType === "account") {
-            await deleteAccount();
-        } else if (deleteType === "database") {
-            await AsyncStorage.clear();
-            Alert.alert("Database gewist", "Alle gegevens zijn succesvol gewist.");
-        }
-        setIsDeleteModalVisible(false);
-    };
-    
-
+        
     const handleUpdate = async () => 
         {
             try 
@@ -196,7 +184,8 @@ const handleNotificationSwitch = async (value: boolean) => {
                 const storedUsers = await AsyncStorage.getItem("users");
                 const users = storedUsers ? JSON.parse(storedUsers) : [];
         
-                const updatedUsers = users.map((u: any) => 
+                const updatedUsers =                 console.log("Gebruiker wordt uitgelogd...");
+                await logout();users.map((u: any) => 
                 {
                     if (u.username === user.username && u.email === user.email) 
                     { 
@@ -240,7 +229,6 @@ const handleNotificationSwitch = async (value: boolean) => {
                 Alert.alert("Fout", "Er is iets misgegaan. Probeer opnieuw.");
             }
         };
-        
         
     if (!fontsLoaded || loading) {
         return <ActivityIndicator size="large" />;
@@ -337,24 +325,21 @@ const handleNotificationSwitch = async (value: boolean) => {
                         </View>
                         <View style={[homeStyles.infoSectionContainer, plantStyles.articlesParent]}>
                             <View style={plantStyles.borderContainer}>
-                                {/* <View style={plantStyles.articleItems}>
-                                    <Text style={[plantStyles.teksten, { fontFamily: "Afacad" }]}>Meldingen ontvangen:</Text>
-                                    <CustomSwitch value={switchValue} onValueChange={setSwitchValue} />
-                                </View> */}
                             <View style={plantStyles.articleItems}>
-    <Text style={[plantStyles.teksten, { fontFamily: "Afacad" }]}>Meldingen ontvangen:</Text>
-    <CustomSwitch
-        value={notificationsEnabled}
-        onValueChange={handleNotificationSwitch}
-    />
-</View>
-
+                                <Text style={[plantStyles.teksten, { fontFamily: "Afacad" }]}>Meldingen ontvangen:</Text>
+                                <CustomSwitch
+                                    value={notificationsEnabled}
+                                    onValueChange={handleNotificationSwitch}
+                                />
+                            </View>
                             </View>
                             <View style={plantStyles.articleItems}>
-                            <TouchableOpacity onPress={() => confirmDelete("account")}>
-                                <Text style={GlobalStyles.gevaarTekst}>Verwijder account</Text>
-                            </TouchableOpacity>
-                                {isAdmin ? (<ClearStorageButton />) : ("")}
+                                <TouchableOpacity onPress={confirmAccountDelete}>
+                                    <Text style={GlobalStyles.gevaarTekst}>Verwijder account</Text>
+                                </TouchableOpacity>
+                                <TouchableOpacity onPress={confirmDatabaseDelete}>
+                                    <Text style={[GlobalStyles.gevaarTekst, { color: "red" }]}>Verwijder database</Text>
+                                </TouchableOpacity>
                             </View>
                         </View>
                     </View>
@@ -479,30 +464,61 @@ const handleNotificationSwitch = async (value: boolean) => {
                 <Modal
                     animationType="slide"
                     transparent={true}
-                    visible={isDeleteModalVisible}
-                    onRequestClose={() => setIsDeleteModalVisible(false)}
+                    visible={isAccountModalVisible}
+                    onRequestClose={() => setIsAccountModalVisible(false)}
                 >
                     <View style={homeStyles.modalOverlay}>
                         <View style={homeStyles.outerModalContainer}>
                             <View style={homeStyles.modalContainer}>
                                 <Text style={homeStyles.modalTitle}>Account Verwijderen</Text>
                                 <Text style={[homeStyles.inputText, { textAlign: "center", marginBottom: 15 }]}>
-                                    Weet je zeker dat je{" "}
-                                    {deleteType === "account" ? "je account" : "de database"} wilt verwijderen?
-                                    Dit kan niet ongedaan worden gemaakt.
+                                    Weet je zeker dat je jouw account wilt verwijderen? Dit kan niet ongedaan worden gemaakt.
                                 </Text>
                                 <View style={{ flexDirection: "row", justifyContent: "space-around" }}>
                                     <TouchableOpacity
                                         style={[homeStyles.button, homeStyles.addButton]}
-                                        onPress={handleConfirmDelete}
+                                        onPress={handleAccountDelete}
                                     >
                                         <Text style={{ fontFamily: "Akaya", color: "white", fontSize: 18 }}>Ja</Text>
                                     </TouchableOpacity>
                                     <TouchableOpacity
                                         style={[homeStyles.button, homeStyles.cancelButton]}
-                                        onPress={() => setIsDeleteModalVisible(false)}
+                                        onPress={() => setIsAccountModalVisible(false)}
                                     >
                                         <Text style={{ fontFamily: "Akaya", color: "white", fontSize: 18 }}>Nee</Text>
+                                    </TouchableOpacity>
+                                </View>
+                            </View>
+                        </View>
+                    </View>
+                </Modal>
+
+                {/* Modal ter bevestiging of de database gewist moet worden */}
+                <Modal
+                    animationType="slide"
+                    transparent={true}
+                    visible={isDatabaseModalVisible}
+                    onRequestClose={() => setIsDatabaseModalVisible(false)}
+                >
+                    <View style={homeStyles.modalOverlay}>
+                        <View style={homeStyles.outerModalContainer}>
+                            <View style={homeStyles.modalContainer}>
+                                <Text style={homeStyles.modalTitle}>Database Wissen</Text>
+                                <Text style={[homeStyles.inputText, { textAlign: "center", marginBottom: 15 }]}>
+                                    Weet je zeker dat je de database wilt wissen? Dit kan niet ongedaan worden gemaakt.
+                                </Text>
+                                <View style={{ flexDirection: "row", justifyContent: "space-around" }}>
+                                    <TouchableOpacity
+                                        style={[homeStyles.button, homeStyles.addButton]}
+                                        onPress={handleDatabaseDelete}
+                                    >
+                                        <Text style={{ fontFamily: "Akaya", color: "white", fontSize: 18 }}>Ja</Text>
+                                    </TouchableOpacity>
+                                    <TouchableOpacity
+                                        style={[homeStyles.button, homeStyles.cancelButton]}
+                                        onPress={() => setIsDatabaseModalVisible(false)}
+                                    >
+                                        <Text style={{ fontFamily: "Akaya", color: "white", fontSize: 18 }}>Annuleren</Text>
                                     </TouchableOpacity>
                                 </View>
                             </View>

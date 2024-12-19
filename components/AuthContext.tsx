@@ -2,6 +2,10 @@ import React, { createContext, useContext, useEffect, useState, ReactNode } from
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useRouter } from "expo-router";
 import bcrypt from "bcryptjs";
+
+const passwordHash = bcrypt.hashSync("admin", 10);
+const isPasswordMatch = bcrypt.compareSync("admin", passwordHash);
+
 import { AuthContextProps, User } from "@/assets/interfaces/customInterfaces";
 import { Plant } from "@/assets/types/plantTypes";
 
@@ -26,9 +30,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
                 const adminData: User = {
                     username: "admin",
                     email: "admin@admin.nl",
-                    password: bcrypt.hashSync("admin", 10),
+                    password: bcrypt.hashSync("admin", 10), 
                     role: "admin",
                     aangemaakt: formatDate(new Date()),
+                    notificatie: false
                 };
     
                 const testUserData: User = {
@@ -37,6 +42,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
                     password: bcrypt.hashSync("test", 10),
                     role: "gebruiker",
                     aangemaakt: formatDate(new Date()),
+                    notificatie: false
                 };
     
                 const storedUsers = await AsyncStorage.getItem("users");
@@ -290,26 +296,26 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }, []);      
 
     const login = async (username: string, password: string) => 
-    {
-        const storedUsers = await AsyncStorage.getItem("users");
-        if (storedUsers) 
         {
-            const users: User[] = JSON.parse(storedUsers);
-            const user = users.find((u) => u.username === username);
-    
-            if (user && bcrypt.compareSync(password, user.password)) 
+            const storedUsers = await AsyncStorage.getItem("users");
+            if (storedUsers) 
             {
-                const auth = { user };
-                await AsyncStorage.setItem("admin", JSON.stringify(auth));
-                setCurrentUser(user);
-                setIsAuthenticated(true);
-                setErrorMessage("");
-                router.push("/home");
-                return;
+                const users: User[] = JSON.parse(storedUsers);
+                const user = users.find((u) => u.username === username);
+        
+                if (user && bcrypt.compareSync(password, user.password)) 
+                {
+                    const auth = { user };
+                    await AsyncStorage.setItem("admin", JSON.stringify(auth));
+                    setCurrentUser(user);
+                    setIsAuthenticated(true);
+                    setErrorMessage("");
+                    router.push("/home");
+                    return;
+                }
             }
-        }
-        setErrorMessage("Ongeldige gebruikersnaam of wachtwoord.");
-    };        
+            setErrorMessage("Ongeldige gebruikersnaam of wachtwoord.");
+        };
 
     const logout = async () => {
         await AsyncStorage.removeItem("admin");
