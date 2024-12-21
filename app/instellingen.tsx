@@ -337,9 +337,11 @@ const Instellingen: React.FC = () => {
                                 <TouchableOpacity onPress={confirmAccountDelete}>
                                     <Text style={GlobalStyles.gevaarTekst}>Verwijder account</Text>
                                 </TouchableOpacity>
+                                {isAdmin && (
                                 <TouchableOpacity onPress={confirmDatabaseDelete}>
                                     <Text style={[GlobalStyles.gevaarTekst, { color: "red" }]}>Verwijder database</Text>
                                 </TouchableOpacity>
+                                )}
                             </View>
                         </View>
                     </View>
